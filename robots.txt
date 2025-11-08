@@ -1,9 +1,2 @@
-# Beritahu semua robot bahwa aturan ini berlaku untuk mereka.
 User-agent: *
-
-# Izinkan robot untuk merayapi semua halaman secara default.
 Disallow:
-
-# Ini adalah bagian terpenting: Tunjukkan lokasi peta situs Anda.
-# Ganti dengan URL sitemap Anda jika sudah punya.
-Sitemap: https://ho.las635948.workers.dev/sitemap.xml
