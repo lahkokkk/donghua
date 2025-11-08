@@ -40,6 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
         upcoming: 'upcoming-container',
         dropped: 'dropped-container'
     };
+    
+    let latestReleaseCurrentPage = 1;
+    const LATEST_RELEASE_ITEMS_PER_PAGE = 10; // 2 rows of 5
 
     async function loadSiteConfig() {
         try {
@@ -127,15 +130,71 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const renderLatestReleasePage = (page, data, container) => {
+        const start = (page - 1) * LATEST_RELEASE_ITEMS_PER_PAGE;
+        const end = start + LATEST_RELEASE_ITEMS_PER_PAGE;
+        const paginatedItems = data.slice(start, end);
+        container.innerHTML = paginatedItems.map(item => createCard(item)).join('');
+    };
+
+    const setupPagination = (currentPage, totalItems, data) => {
+        const paginationContainer = document.getElementById('latest-release-pagination');
+        if (!paginationContainer) return;
+        
+        const totalPages = Math.ceil(totalItems / LATEST_RELEASE_ITEMS_PER_PAGE);
+        paginationContainer.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        const createButton = (content, newPage, isDisabled = false, isCurrent = false) => {
+            const li = document.createElement('li');
+            const button = document.createElement('button');
+            button.innerHTML = content;
+            button.className = `px-3 py-2 leading-tight border border-gray-700 ${isCurrent ? 'text-black bg-white' : 'text-gray-400 bg-[#2a2a2a] hover:bg-gray-700 hover:text-white'} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`;
+            button.disabled = isDisabled;
+            if (!isDisabled) {
+                button.addEventListener('click', () => {
+                    latestReleaseCurrentPage = newPage;
+                    renderLatestReleasePage(latestReleaseCurrentPage, data, document.getElementById('latest-release-container'));
+                    setupPagination(latestReleaseCurrentPage, totalItems, data);
+                });
+            }
+            li.appendChild(button);
+            return li;
+        };
+
+        // Prev Button
+        paginationContainer.appendChild(createButton('<i class="fa-solid fa-chevron-left"></i>', currentPage - 1, currentPage === 1));
+
+        // Page Numbers
+        for (let i = 1; i <= totalPages; i++) {
+            paginationContainer.appendChild(createButton(i, i, false, currentPage === i));
+        }
+
+        // Next Button
+        paginationContainer.appendChild(createButton('<i class="fa-solid fa-chevron-right"></i>', currentPage + 1, currentPage === totalPages));
+    };
+
     const displaySections = (allContent) => {
+        const latestReleaseData = allContent.filter(item => item.sections && item.sections.includes('latestRelease'));
+
          for (const sectionKey in sectionMappings) {
             const container = document.getElementById(sectionMappings[sectionKey]);
             if (container) {
-                const sectionData = allContent.filter(item => item.sections && item.sections.includes(sectionKey));
-                if (sectionData.length > 0) {
-                    container.innerHTML = sectionData.map(item => createCard(item)).join('');
+                if (sectionKey === 'latestRelease') {
+                    if (latestReleaseData.length > 0) {
+                        renderLatestReleasePage(latestReleaseCurrentPage, latestReleaseData, container);
+                        setupPagination(latestReleaseCurrentPage, latestReleaseData.length, latestReleaseData);
+                    } else {
+                        container.innerHTML = `<p class="col-span-full text-gray-500">No content available in this section.</p>`;
+                    }
                 } else {
-                    container.innerHTML = `<p class="col-span-full text-gray-500">No content available in this section.</p>`;
+                    const sectionData = allContent.filter(item => item.sections && item.sections.includes(sectionKey));
+                    if (sectionData.length > 0) {
+                        container.innerHTML = sectionData.map(item => createCard(item)).join('');
+                    } else {
+                        container.innerHTML = `<p class="col-span-full text-gray-500">No content available in this section.</p>`;
+                    }
                 }
             }
         }

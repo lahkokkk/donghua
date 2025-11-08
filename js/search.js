@@ -61,7 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (results.length > 0) {
             // Determine correct path for details.html
             const isInDataFolder = window.location.pathname.includes('/data/');
-            const detailPathPrefix = isInDataFolder ? '' : 'data/';
+            const onListPage = window.location.pathname.includes('/list.html');
+            let detailPathPrefix = isInDataFolder ? '' : 'data/';
+            if (onListPage) {
+                 detailPathPrefix = 'data/';
+            }
 
             searchResultsContainer.innerHTML = results.map(item => `
                 <a href="${detailPathPrefix}details.html?id=${item.id}" class="block p-3 hover:bg-[#2a2a2a] rounded-md transition-colors">

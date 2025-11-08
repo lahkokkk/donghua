@@ -69,6 +69,7 @@
             <section>
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold text-white">Popular Today</h2>
+                    <a href="list.html?section=popularToday" class="bg-[#2a2a2a] hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded">VIEW ALL</a>
                 </div>
                 <div id="popular-today-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     <p class="col-span-full text-gray-500">Loading popular shows...</p>
@@ -78,18 +79,24 @@
             <section>
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold text-white">Latest Release</h2>
-                    <a href="#" class="bg-[#2a2a2a] hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded">VIEW ALL</a>
+                    <a href="list.html?section=latestRelease" class="bg-[#2a2a2a] hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded">VIEW ALL</a>
                 </div>
                 <div id="latest-release-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     <p class="col-span-full text-gray-500">Loading latest releases...</p>
                 </div>
-                <div class="text-center mt-6"><button class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md font-semibold">Next <i class="fa-solid fa-chevron-right ml-2 text-xs"></i></button></div>
+                <div class="flex justify-center mt-6">
+                    <nav>
+                        <ul id="latest-release-pagination" class="inline-flex items-center -space-x-px">
+                            <!-- Pagination will be generated here -->
+                        </ul>
+                    </nav>
+                </div>
             </section>
             
             <section>
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold text-white">Movie</h2>
-                    <a href="#" class="bg-[#2a2a2a] hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded">VIEW ALL</a>
+                    <a href="movies.html" class="bg-[#2a2a2a] hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded">VIEW ALL</a>
                 </div>
                 <div id="movies-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     <p class="col-span-full text-gray-500">Loading movies...</p>
@@ -99,7 +106,7 @@
             <section>
                  <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold text-white">Upcoming Donghua</h2>
-                    <a href="#" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded">VIEW ALL</a>
+                    <a href="list.html?section=upcoming" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded">VIEW ALL</a>
                 </div>
                  <div id="upcoming-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     <p class="col-span-full text-gray-500">Loading upcoming shows...</p>
@@ -109,7 +116,7 @@
             <section>
                  <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold text-white">Dropped Project</h2>
-                    <a href="#" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded">VIEW ALL</a>
+                    <a href="list.html?section=dropped" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded">VIEW ALL</a>
                 </div>
                  <div id="dropped-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     <p class="col-span-full text-gray-500">Loading dropped projects...</p>
