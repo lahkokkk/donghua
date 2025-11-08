@@ -53,6 +53,12 @@ document.addEventListener('DOMContentLoaded', () => {
                   ).join('')
                 : '<li><p class="text-gray-500">No episodes available yet.</p></li>';
 
+            const genreListHTML = item.genres && item.genres.length > 0
+                ? item.genres.map(genre => 
+                    `<a href="../genres.html?genre=${encodeURIComponent(genre)}" class="bg-[#2a2a2a] hover:bg-red-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors">${genre}</a>`
+                  ).join('')
+                : '';
+
             contentArea.innerHTML = `
                 <div class="flex flex-col md:flex-row gap-8">
                     <div class="md:w-1/3 flex-shrink-0">
@@ -64,6 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span>${item.type}</span>
                             ${item.subbed ? '<span><i class="fa-solid fa-closed-captioning"></i> Subbed</span>' : ''}
                             ${item.ongoing ? '<span><i class="fa-solid fa-clock"></i> Ongoing</span>' : ''}
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${genreListHTML}
                         </div>
                         
                         <div class="bg-[#1a1a1a] p-4 rounded-lg">

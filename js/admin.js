@@ -235,6 +235,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const resetForm = () => {
             form.reset();
             episodesContainer.innerHTML = '';
+            document.querySelectorAll('input[name="genre_checkbox"]').forEach(cb => cb.checked = false);
+            form.other_genres.value = '';
             editState = null;
             formSubmitButton.textContent = 'Add Content';
             cancelButton.classList.add('hidden');
@@ -388,6 +390,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     cb.checked = itemToEdit.sections.includes(cb.value);
                 });
 
+                // Handle Genres
+                document.querySelectorAll('input[name="genre_checkbox"]').forEach(cb => cb.checked = false);
+                form.other_genres.value = '';
+                if (itemToEdit.genres && Array.isArray(itemToEdit.genres)) {
+                    const standardGenres = Array.from(document.querySelectorAll('input[name="genre_checkbox"]')).map(cb => cb.value);
+                    const customGenres = [];
+                    itemToEdit.genres.forEach(genre => {
+                        const checkbox = document.querySelector(`input[name="genre_checkbox"][value="${genre}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        } else {
+                            customGenres.push(genre);
+                        }
+                    });
+                    form.other_genres.value = customGenres.join(', ');
+                }
+
                 episodesContainer.innerHTML = '';
                 if(itemToEdit.episodes) {
                     itemToEdit.episodes.forEach(ep => {
@@ -444,6 +463,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            const selectedGenres = Array.from(document.querySelectorAll('input[name="genre_checkbox"]:checked')).map(cb => cb.value);
+            const otherGenres = formData.get('other_genres').split(',')
+                                    .map(g => g.trim())
+                                    .filter(g => g);
+            const allGenres = [...new Set([...selectedGenres, ...otherGenres])];
+
             const episodes = [];
             document.querySelectorAll('.episode-field').forEach(field => {
                 const epNumber = field.querySelector('input[name="ep_number"]').value.trim();
@@ -470,6 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 subbed: formData.has('subbed'),
                 ongoing: formData.has('ongoing'),
                 synopsis: formData.get('synopsis'),
+                genres: allGenres,
                 sections: selectedSections,
                 episodes: episodes
             };

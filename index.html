@@ -11,15 +11,37 @@
 </head>
 <body class="bg-[#121212] text-gray-300 font-sans">
 
+    <!-- Mobile Menu (Sidebar) -->
+    <div id="mobile-menu" class="fixed inset-0 bg-black bg-opacity-75 z-[100] hidden">
+        <div id="menu-panel" class="bg-[#1a1a1a] w-64 h-full absolute top-0 left-0 transform -translate-x-full transition-transform duration-300 ease-in-out">
+            <div class="p-4 flex justify-between items-center border-b border-gray-700">
+                <a href="index.html" class="text-xl font-bold tracking-wider">
+                    <span class="text-white">Donghua</span><span class="text-red-500">动画</span>
+                </a>
+                <button id="close-menu-btn" class="text-white text-2xl">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li><a href="index.html" class="block py-2 px-3 rounded-md hover:bg-red-600 text-white">Home</a></li>
+                    <li><a href="genres.html" class="block py-2 px-3 rounded-md hover:bg-red-600 text-white">Genres</a></li>
+                    <li><a href="movies.html" class="block py-2 px-3 rounded-md hover:bg-red-600 text-white">Movies</a></li>
+                    <li><a href="schedule.html" class="block py-2 px-3 rounded-md hover:bg-red-600 text-white">Schedule</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
     <header class="bg-[#1a1a1a] p-4 sticky top-0 z-50 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
-            <button class="text-white text-2xl">
+            <button id="menu-btn" class="text-white text-2xl">
                 <i class="fa-solid fa-bars"></i>
             </button>
             <a href="index.html" class="text-2xl font-bold tracking-wider">
                 <span id="header-title" class="text-white">Donghua</span><span id="header-subtitle" class="text-red-500">动画</span>
             </a>
-            <button class="text-white text-xl">
+            <button id="search-btn" class="text-white text-xl">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </div>
@@ -103,6 +125,20 @@
         </div>
     </footer>
 
+    <!-- Search Modal -->
+    <div id="search-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[100] hidden items-start justify-center pt-20">
+        <div id="search-modal-content" class="bg-[#1a1a1a] w-full max-w-2xl rounded-lg shadow-xl relative">
+            <button id="close-search-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">&times;</button>
+            <div class="p-6">
+                <input type="text" id="search-input" placeholder="Search for Donghua..." class="w-full bg-[#2a2a2a] border border-gray-600 rounded-md py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                <div id="search-results" class="mt-4 max-h-[60vh] overflow-y-auto">
+                    <!-- Results will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="js/script.js"></script>
+    <script src="js/search.js"></script>
 </body>
 </html>

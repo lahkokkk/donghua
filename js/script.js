@@ -1,5 +1,35 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuPanel = document.getElementById('menu-panel');
+    const closeMenuBtn = document.getElementById('close-menu-btn');
+
+    if (menuBtn && mobileMenu && menuPanel && closeMenuBtn) {
+        const openMenu = () => {
+            mobileMenu.classList.remove('hidden');
+            setTimeout(() => {
+                menuPanel.classList.remove('-translate-x-full');
+            }, 10);
+        };
+
+        const closeMenu = () => {
+            menuPanel.classList.add('-translate-x-full');
+            setTimeout(() => {
+                mobileMenu.classList.add('hidden');
+            }, 300);
+        };
+
+        menuBtn.addEventListener('click', openMenu);
+        closeMenuBtn.addEventListener('click', closeMenu);
+
+        mobileMenu.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                closeMenu();
+            }
+        });
+    }
+
     const apiEndpoint = 'https://jsonbin-clone.bisay510.workers.dev/16f38f54-9873-45ed-8692-2ec5ea899365';
     const siteConfigApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/0353d142-7372-443d-adb7-63bafdd0791e';
 
