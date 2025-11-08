@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imageUploadInput = document.getElementById('imageUpload');
         const imageUrlInput = document.getElementById('imageUrl');
         const uploadStatus = document.getElementById('upload-status');
-        const freeImageApiKey = '6d207e02198a847aa98d0a2a901485a5';
+        const imgbbApiKey = 'fb57bbe5ce83ff20b7bd354a3b2f0735';
 
         imageUploadInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -121,18 +121,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     uploadStatus.textContent = 'Uploading... This may take a moment.';
 
                     const formData = new FormData();
-                    formData.append('key', freeImageApiKey);
-                    formData.append('source', base64String);
+                    formData.append('key', imgbbApiKey);
+                    formData.append('image', base64String);
 
-                    const response = await fetch('http://freeimage.host/api/1/upload', {
+                    const response = await fetch('https://api.imgbb.com/1/upload', {
                         method: 'POST',
                         body: formData,
                     });
                     
                     const result = await response.json();
 
-                    if (response.ok && result.status_code === 200) {
-                        imageUrlInput.value = result.image.url;
+                    if (response.ok && result.success) {
+                        imageUrlInput.value = result.data.url;
                         uploadStatus.textContent = 'Upload successful!';
                         setTimeout(() => { uploadStatus.textContent = ''; }, 5000);
                     } else {
