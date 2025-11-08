@@ -61,6 +61,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.title = `Watching ${item.title} - Ep ${currentEpisode.ep} - Donghua动画`;
 
+            // Update Meta Tags
+            const setMetaTag = (property, content) => {
+                let element = document.querySelector(`meta[name="${property}"], meta[property="${property}"]`);
+                if (!element) {
+                    element = document.createElement('meta');
+                    if (property.startsWith('og:')) {
+                        element.setAttribute('property', property);
+                    } else {
+                        element.setAttribute('name', property);
+                    }
+                    document.head.appendChild(element);
+                }
+                element.setAttribute('content', content);
+            };
+
+            const description = item.synopsis ? item.synopsis.substring(0, 160) + '...' : `Watch ${item.title} Episode ${currentEpisode.ep}`;
+
+            setMetaTag('description', description);
+            setMetaTag('og:title', `${item.title} - Episode ${currentEpisode.ep}`);
+            setMetaTag('og:description', description);
+            setMetaTag('og:image', item.imageUrl);
+            setMetaTag('og:url', window.location.href);
+            setMetaTag('og:type', 'video.episode');
+            setMetaTag('twitter:card', 'summary_large_image');
+
             // Handle both old {url} and new {servers} episode format
             const servers = currentEpisode.servers || (currentEpisode.url ? [{name: 'Default', url: currentEpisode.url}] : []);
 

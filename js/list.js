@@ -62,10 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const renderPage = (page, data, sectionName) => {
-        pageTitle.textContent = sectionName.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-        document.title = `${pageTitle.textContent} - Donghua动画`;
-        
+    const renderPage = (page, data) => {
         const start = (page - 1) * ITEMS_PER_PAGE;
         const end = start + ITEMS_PER_PAGE;
         const paginatedItems = data.slice(start, end);
@@ -129,8 +126,41 @@ document.addEventListener('DOMContentLoaded', () => {
             allContent.sort((a, b) => b.id - a.id);
 
             const sectionData = allContent.filter(item => item.sections && item.sections.includes(section));
+
+            const sectionName = section.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+            const siteTitle = 'Donghua动画';
+            const pageTitleText = `${sectionName} - ${siteTitle}`;
             
-            renderPage(page, sectionData, section);
+            pageTitle.textContent = sectionName;
+            document.title = pageTitleText;
+
+            const setMetaTag = (property, content) => {
+                if (!content) return;
+                let element = document.querySelector(`meta[name="${property}"], meta[property="${property}"]`);
+                if (!element) {
+                    element = document.createElement('meta');
+                    if (property.startsWith('og:')) {
+                        element.setAttribute('property', property);
+                    } else {
+                        element.setAttribute('name', property);
+                    }
+                    document.head.appendChild(element);
+                }
+                element.setAttribute('content', content);
+            };
+
+            const description = `Lihat semua Donghua dalam kategori ${sectionName} dengan subtitle Indonesia.`;
+            const firstItemImage = sectionData.length > 0 ? sectionData[0].imageUrl : 'https://picsum.photos/1200/630';
+
+            setMetaTag('description', description);
+            setMetaTag('og:title', pageTitleText);
+            setMetaTag('og:description', description);
+            setMetaTag('og:image', firstItemImage);
+            setMetaTag('twitter:card', 'summary_large_image');
+            setMetaTag('og:type', 'website');
+            setMetaTag('og:url', window.location.href);
+            
+            renderPage(page, sectionData);
             setupPagination(page, sectionData.length, section);
 
         } catch (error) {

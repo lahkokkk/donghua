@@ -67,6 +67,35 @@ document.addEventListener('DOMContentLoaded', () => {
             allContent.sort((a, b) => b.id - a.id);
 
             const movies = allContent.filter(item => item.sections && item.sections.includes('movies'));
+
+            const setMetaTag = (property, content) => {
+                if (!content) return;
+                let element = document.querySelector(`meta[name="${property}"], meta[property="${property}"]`);
+                if (!element) {
+                    element = document.createElement('meta');
+                    if (property.startsWith('og:')) {
+                        element.setAttribute('property', property);
+                    } else {
+                        element.setAttribute('name', property);
+                    }
+                    document.head.appendChild(element);
+                }
+                element.setAttribute('content', content);
+            };
+
+            const siteTitle = 'Donghua动画';
+            const pageTitleText = `Movies - ${siteTitle}`;
+            document.title = pageTitleText;
+            const description = 'Tonton film Donghua terbaru dengan subtitle Indonesia.';
+            const firstMovieImage = movies.length > 0 ? movies[0].imageUrl : 'https://picsum.photos/1200/630';
+
+            setMetaTag('description', description);
+            setMetaTag('og:title', pageTitleText);
+            setMetaTag('og:description', description);
+            setMetaTag('og:image', firstMovieImage);
+            setMetaTag('twitter:card', 'summary_large_image');
+            setMetaTag('og:type', 'website');
+            setMetaTag('og:url', window.location.href);
             
             if (movies.length > 0) {
                 container.innerHTML = movies.map(item => createCard(item)).join('');

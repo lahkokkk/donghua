@@ -64,14 +64,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const params = new URLSearchParams(window.location.search);
             const selectedGenre = params.get('genre');
+            
+            const setMetaTag = (property, content) => {
+                if (!content) return;
+                let element = document.querySelector(`meta[name="${property}"], meta[property="${property}"]`);
+                if (!element) {
+                    element = document.createElement('meta');
+                    if (property.startsWith('og:')) {
+                        element.setAttribute('property', property);
+                    } else {
+                        element.setAttribute('name', property);
+                    }
+                    document.head.appendChild(element);
+                }
+                element.setAttribute('content', content);
+            };
+
+            const siteTitle = 'Donghua动画';
 
             if (selectedGenre) {
                 // Display content for a specific genre
                 const genreName = decodeURIComponent(selectedGenre);
-                document.title = `${genreName} - Genres - Donghua动画`;
+                const pageTitleText = `${genreName} - Genres - ${siteTitle}`;
+                document.title = pageTitleText;
                 if (pageTitle) pageTitle.textContent = genreName;
                 
                 const filteredContent = allContent.filter(item => item.genres && item.genres.includes(genreName));
+
+                const description = `Daftar Donghua dengan genre ${genreName} subtitle Indonesia.`;
+                const firstItemImage = filteredContent.length > 0 ? filteredContent[0].imageUrl : 'https://picsum.photos/1200/630';
+    
+                setMetaTag('description', description);
+                setMetaTag('og:title', pageTitleText);
+                setMetaTag('og:description', description);
+                setMetaTag('og:image', firstItemImage);
+                setMetaTag('twitter:card', 'summary_large_image');
+                setMetaTag('og:type', 'website');
+                setMetaTag('og:url', window.location.href);
                 
                 if (filteredContent.length > 0) {
                     const contentGrid = document.createElement('div');
@@ -85,7 +114,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } else {
                 // Display the list of all genres
+                const pageTitleText = `Genres - ${siteTitle}`;
+                document.title = pageTitleText;
                 if (pageTitle) pageTitle.textContent = 'Genres';
+
+                const description = `Pilih genre Donghua yang kamu suka dan temukan seri favoritmu.`;
+                setMetaTag('description', description);
+                setMetaTag('og:title', pageTitleText);
+                setMetaTag('og:description', description);
+                setMetaTag('twitter:card', 'summary_large_image');
+                setMetaTag('og:type', 'website');
+                setMetaTag('og:url', window.location.href);
+
                 const allGenres = new Set();
                 allContent.forEach(item => {
                     if (item.genres && Array.isArray(item.genres)) {

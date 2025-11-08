@@ -53,16 +53,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.title = `${item.title} - Donghua动画`;
 
-            // Update Meta Tags
-            const metaDescription = document.querySelector('meta[name="description"]');
-            const metaKeywords = document.querySelector('meta[name="keywords"]');
+            // Helper function to set meta tags
+            const setMetaTag = (property, content) => {
+                if (!content) return; // Don't set empty tags
+                let element = document.querySelector(`meta[name="${property}"], meta[property="${property}"]`);
+                if (!element) {
+                    element = document.createElement('meta');
+                    if (property.startsWith('og:')) {
+                        element.setAttribute('property', property);
+                    } else {
+                        element.setAttribute('name', property);
+                    }
+                    document.head.appendChild(element);
+                }
+                element.setAttribute('content', content);
+            };
 
-            if (metaDescription && item.synopsis) {
-                metaDescription.setAttribute('content', item.synopsis.substring(0, 160) + '...');
-            }
-            if (metaKeywords && item.metaTags) {
-                metaKeywords.setAttribute('content', item.metaTags);
-            }
+            // Update Meta Tags
+            const description = item.synopsis ? item.synopsis.substring(0, 160).trim() + '...' : `Details for ${item.title}`;
+            const title = `${item.title} - Donghua动画`;
+
+            setMetaTag('description', description);
+            setMetaTag('keywords', item.metaTags);
+            setMetaTag('og:title', title);
+            setMetaTag('og:description', description);
+            setMetaTag('og:image', item.imageUrl);
+            setMetaTag('og:type', 'video.tv_show');
+            setMetaTag('og:url', window.location.href);
+            setMetaTag('twitter:card', 'summary_large_image');
 
             const episodeListHTML = item.episodes && item.episodes.length > 0 
                 ? item.episodes.map(ep => 

@@ -50,6 +50,39 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) return; // Fail silently
             const config = await response.json();
 
+            // This logic is for index.html only
+            if (document.getElementById('slider-container')) {
+                 const setMetaTag = (property, content) => {
+                    if (!content) return;
+                    let element = document.querySelector(`meta[name="${property}"], meta[property="${property}"]`);
+                    if (!element) {
+                        element = document.createElement('meta');
+                        if (property.startsWith('og:')) {
+                            element.setAttribute('property', property);
+                        } else {
+                            element.setAttribute('name', property);
+                        }
+                        document.head.appendChild(element);
+                    }
+                    element.setAttribute('content', content);
+                };
+
+                const siteFullName = `${config.headerTitle || 'Donghua'}${config.headerSubtitle || '动画'}`;
+                const pageTitle = `${siteFullName} - Nonton Donghua Sub Indo Gratis`;
+                document.title = pageTitle;
+
+                const description = config.announcement ? config.announcement.body : 'Jelajahi dunia Donghua dengan subtitle Indonesia kualitas terbaik.';
+                const imageUrl = config.favicon || `https://picsum.photos/1200/630?v=${siteFullName}`;
+
+                setMetaTag('description', description);
+                setMetaTag('og:title', pageTitle);
+                setMetaTag('og:description', description);
+                setMetaTag('og:image', imageUrl);
+                setMetaTag('og:type', 'website');
+                setMetaTag('og:url', window.location.origin);
+                setMetaTag('twitter:card', 'summary_large_image');
+            }
+
             // Set Favicon
             const favicon = document.getElementById('favicon');
             if (favicon && config.favicon) {
