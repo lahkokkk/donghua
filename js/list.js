@@ -1,6 +1,10 @@
+// KODE INI UNTUK list.js
 document.addEventListener('DOMContentLoaded', () => {
-    const apiEndpoint = 'https://ho.las635948.workers.dev/';
-    const siteConfigApiUrl = 'https://ho.las635948.workers.dev/';
+    // =======================================================
+    // PERBAIKAN: Gunakan path API lokal dari Worker
+    const apiEndpoint = '/api/content';
+    const siteConfigApiUrl = '/api/config';
+    // =======================================================
 
     const contentContainer = document.getElementById('list-content');
     const pageTitle = document.getElementById('page-title');
@@ -13,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const ongoingIcon = !isMovie && item.ongoing ? `<span class="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs"><i class="fa-solid fa-clock"></i></span>` : '';
         const subbedBadge = item.subbed ? `<div class="absolute bottom-2 right-2"><span class="bg-yellow-500 text-black text-xs px-2 py-1 rounded">Sub</span></div>` : '';
         const episodeBadge = !isMovie && item.episode ? `<div class="absolute bottom-2 left-2"><span class="text-white text-xs font-bold">${item.episode}</span></div>` : '';
-        const completedBanner = isMovie && item.status === 'Completed' ? `<div class="absolute -top-8 -left-8 w-28 h-12 bg-green-500 transform -rotate-45 flex items-end justify-center"><span class="text-white text-xs font-bold pb-1">COMPLETED</span></div>` : '';
         const typeBadgeColor = isMovie ? 'bg-purple-600' : 'bg-red-600';
 
         return `
@@ -21,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="relative overflow-hidden">
                     <img src="${item.imageUrl}" alt="${item.title}" class="w-full h-auto aspect-[2/3] object-cover transform group-hover:scale-105 transition-transform duration-300">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                    ${completedBanner}
                     <span class="absolute top-2 left-2 ${typeBadgeColor} text-white text-xs px-2 py-1 rounded">${item.type}</span>
                     ${ongoingIcon}
                     ${episodeBadge}
@@ -118,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // Mengambil data dari /api/content
             const response = await fetch(`${apiEndpoint}?v=${new Date().getTime()}`);
             if (!response.ok) throw new Error('Failed to load content');
             const allContent = await response.json();
@@ -134,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             pageTitle.textContent = sectionName;
             document.title = pageTitleText;
 
+            // Meta tag client-side ini adalah fallback.
             const setMetaTag = (property, content) => {
                 if (!content) return;
                 let element = document.querySelector(`meta[name="${property}"], meta[property="${property}"]`);
