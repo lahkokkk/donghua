@@ -9,63 +9,151 @@ document.addEventListener('DOMContentLoaded', () => {
         return hashHex;
     }
 
-    // --- LOGIN LOGIC ---
     const loginModal = document.getElementById('login-modal');
-    const loginForm = document.getElementById('login-form');
     const mainContent = document.getElementById('main-content');
-    const loginApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/c2174c60-6862-474b-9310-5a9b73cc4b47';
-    const submitButton = loginForm.querySelector('button[type="submit"]');
+    
+    // --- AUTHENTICATION CHECK ---
+    if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+        loginModal.classList.add('hidden');
+        mainContent.classList.remove('hidden');
+        initializeAdminPanel();
+    } else {
+        // --- LOGIN LOGIC ---
+        const loginForm = document.getElementById('login-form');
+        const loginApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/c2174c60-6862-474b-9310-5a9b73cc4b47';
+        const submitButton = loginForm.querySelector('button[type="submit"]');
 
-    if (!window.crypto || !window.crypto.subtle) {
-        const errorEl = document.getElementById('login-error');
-        if (errorEl) errorEl.textContent = 'Crypto API not supported. Use HTTPS.';
-        if (submitButton) submitButton.disabled = true;
-        alert('Error: This page requires a secure connection (HTTPS) to function correctly.');
-        return;
+        if (!window.crypto || !window.crypto.subtle) {
+            const errorEl = document.getElementById('login-error');
+            if (errorEl) errorEl.textContent = 'Crypto API not supported. Use HTTPS.';
+            if (submitButton) submitButton.disabled = true;
+            alert('Error: This page requires a secure connection (HTTPS) to function correctly.');
+            return;
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = e.target.email.value.trim().toLowerCase();
+            const password = e.target.password.value.trim();
+            const errorEl = document.getElementById('login-error');
+
+            errorEl.textContent = '';
+            submitButton.disabled = true;
+            submitButton.textContent = 'Logging in...';
+
+            try {
+                const res = await fetch(loginApiUrl + `?v=${new Date().getTime()}`);
+                if (!res.ok) throw new Error('Could not fetch credentials.');
+                const credentials = await res.json();
+
+                const hashedEmail = await sha256(email + credentials.email_salt);
+                const hashedPassword = await sha256(password + credentials.password_salt);
+
+                if (hashedEmail === credentials.email && hashedPassword === credentials.password) {
+                    sessionStorage.setItem('isAdminLoggedIn', 'true');
+                    loginModal.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                    initializeAdminPanel();
+                } else {
+                    errorEl.textContent = 'Invalid email or password.';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorEl.textContent = 'An error occurred during login.';
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Login';
+            }
+        });
     }
 
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = e.target.email.value.trim().toLowerCase();
-        const password = e.target.password.value.trim();
-        const errorEl = document.getElementById('login-error');
-
-        errorEl.textContent = '';
-        submitButton.disabled = true;
-        submitButton.textContent = 'Logging in...';
-
-        try {
-            const res = await fetch(loginApiUrl + `?v=${new Date().getTime()}`);
-            if (!res.ok) throw new Error('Could not fetch credentials.');
-            const credentials = await res.json();
-
-            const hashedEmail = await sha256(email + credentials.email_salt);
-            const hashedPassword = await sha256(password + credentials.password_salt);
-
-            if (hashedEmail === credentials.email && hashedPassword === credentials.password) {
-                loginModal.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-                initializeAdminPanel();
-            } else {
-                errorEl.textContent = 'Invalid email or password.';
-            }
-        } catch (error) {
-            console.error('Login error:', error);
-            errorEl.textContent = 'An error occurred during login.';
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = 'Login';
-        }
-    });
 
     // --- MAIN ADMIN PANEL LOGIC ---
     function initializeAdminPanel() {
+        // Add Logout functionality
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('isAdminLoggedIn');
+                location.reload();
+            });
+        }
+
         const allContentApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/16f38f54-9873-45ed-8692-2ec5ea899365';
         const form = document.getElementById('content-form');
         const contentContainer = document.getElementById('current-content-container');
         const episodesContainer = document.getElementById('episodes-container');
         const addEpisodeBtn = document.getElementById('add-episode-btn');
         const formSubmitButton = form.querySelector('button[type="submit"]');
+
+        const imageUploadInput = document.getElementById('imageUpload');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const uploadStatus = document.getElementById('upload-status');
+        const freeImageApiKey = '6d207e02198a847aa98d0a2a901485a5';
+
+        imageUploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                uploadStatus.textContent = 'Error: Please select an image file.';
+                imageUploadInput.value = '';
+                return;
+            }
+
+            if (file.size > 16 * 1024 * 1024) { // 16MB limit
+                uploadStatus.textContent = 'Error: File is too large (max 16MB).';
+                imageUploadInput.value = '';
+                return;
+            }
+
+            uploadStatus.textContent = 'Reading file...';
+            formSubmitButton.disabled = true;
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            reader.onload = async () => {
+                try {
+                    const base64String = reader.result.split(',')[1];
+                    uploadStatus.textContent = 'Uploading... This may take a moment.';
+
+                    const formData = new FormData();
+                    formData.append('key', freeImageApiKey);
+                    formData.append('source', base64String);
+
+                    const response = await fetch('http://freeimage.host/api/1/upload', {
+                        method: 'POST',
+                        body: formData,
+                    });
+                    
+                    const result = await response.json();
+
+                    if (response.ok && result.status_code === 200) {
+                        imageUrlInput.value = result.image.url;
+                        uploadStatus.textContent = 'Upload successful!';
+                        setTimeout(() => { uploadStatus.textContent = ''; }, 5000);
+                    } else {
+                        throw new Error(result.error ? result.error.message : 'Unknown API error');
+                    }
+
+                } catch (error) {
+                    console.error('Image upload error:', error);
+                    uploadStatus.textContent = `Error: ${error.message}`;
+                } finally {
+                    imageUploadInput.value = '';
+                    formSubmitButton.disabled = false;
+                }
+            };
+
+            reader.onerror = () => {
+                uploadStatus.textContent = 'Error reading file.';
+                console.error('FileReader error');
+                formSubmitButton.disabled = false;
+            };
+        });
 
         let allContent = [];
         let editState = null;

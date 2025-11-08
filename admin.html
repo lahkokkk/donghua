@@ -36,8 +36,9 @@
     <!-- Main Content (Initially Hidden) -->
     <div id="main-content" class="hidden">
         <header class="bg-[#1a1a1a] p-4 shadow-md">
-            <div class="container mx-auto">
+            <div class="container mx-auto flex justify-between items-center">
                 <h1 class="text-white text-2xl font-bold">Donghua动画 Content Management</h1>
+                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 focus:ring-offset-gray-800 text-sm">Logout</button>
             </div>
         </header>
 
@@ -52,9 +53,16 @@
                             <label for="title" class="block text-sm font-medium text-gray-400">Title</label>
                             <input type="text" id="title" name="title" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
                         </div>
-                        <div>
-                            <label for="imageUrl" class="block text-sm font-medium text-gray-400">Image URL</label>
-                            <input type="url" id="imageUrl" name="imageUrl" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                        <div class="space-y-2">
+                            <div>
+                                <label for="imageUpload" class="block text-sm font-medium text-gray-400">Upload Image</label>
+                                <input type="file" id="imageUpload" name="imageUpload" accept="image/*" class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700">
+                                <p id="upload-status" class="text-xs text-gray-500 mt-1 h-4"></p>
+                            </div>
+                            <div>
+                                <label for="imageUrl" class="block text-sm font-medium text-gray-400">Or enter Image URL</label>
+                                <input type="url" id="imageUrl" name="imageUrl" placeholder="Image URL will be populated after upload" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                            </div>
                         </div>
                          <div>
                             <label for="episode" class="block text-sm font-medium text-gray-400">Latest Episode (Card display)</label>
