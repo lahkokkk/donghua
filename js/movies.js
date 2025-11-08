@@ -63,6 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Failed to load content data');
             const allContent = await response.json();
 
+            // Sort content by ID descending (newest first)
+            allContent.sort((a, b) => b.id - a.id);
+
             const movies = allContent.filter(item => item.sections && item.sections.includes('movies'));
             
             if (movies.length > 0) {

@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Content Management Handling ---
         const form = document.getElementById('content-form');
-        const contentContainer = document.getElementById('current-content-container');
+        const contentManagerContainer = document.getElementById('current-content-manager');
         const episodesContainer = document.getElementById('episodes-container');
         const addEpisodeBtn = document.getElementById('add-episode-btn');
         const formSubmitButton = form.querySelector('button[type="submit"]');
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         async function loadContent() {
-            contentContainer.innerHTML = '<p class="text-gray-400">Loading content...</p>';
+            contentManagerContainer.innerHTML = '<p class="text-gray-400">Loading content...</p>';
             try {
                 const res = await fetch(allContentApiUrl + `?v=${new Date().getTime()}`);
                 if (!res.ok) throw new Error('Failed to load content');
@@ -365,13 +365,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayContent();
             } catch (error) {
                 console.error("Could not load content:", error);
-                contentContainer.innerHTML = `<p class="text-red-500">Failed to load content: ${error.message}.</p>`;
+                contentManagerContainer.innerHTML = `<p class="text-red-500">Failed to load content: ${error.message}.</p>`;
             }
         }
 
         function displayContent() {
-            contentContainer.innerHTML = '';
-            const sections = ['popularToday', 'latestRelease', 'movies', 'upcoming', 'dropped', 'slider'];
+            if (!contentManagerContainer) return;
+        
+            contentManagerContainer.innerHTML = '';
+            const sections = ['slider', 'popularToday', 'latestRelease', 'movies', 'upcoming', 'dropped'];
             const contentBySection = allContent.reduce((acc, item) => {
                 if (!item.sections) item.sections = [];
                 item.sections.forEach(section => {
@@ -380,20 +382,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 return acc;
             }, {});
-
-            sections.forEach(sectionKey => {
+        
+            const tabNav = document.createElement('nav');
+            tabNav.className = 'border-b border-gray-700 mb-4 -mb-px flex space-x-6 overflow-x-auto';
+            
+            const tabPanesContainer = document.createElement('div');
+        
+            sections.forEach((sectionKey, index) => {
+                const isActive = index === 0;
                 const sectionData = contentBySection[sectionKey] || [];
-                const sectionDiv = document.createElement('div');
-                sectionDiv.className = 'mb-8';
-
-                const sectionTitle = document.createElement('h3');
-                sectionTitle.className = 'text-lg font-semibold text-white mb-4 border-b border-gray-700 pb-2';
-                sectionTitle.textContent = sectionKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                sectionDiv.appendChild(sectionTitle);
-
+                
+                // Create Tab Button
+                const tabButton = document.createElement('button');
+                const sectionName = sectionKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                tabButton.textContent = `${sectionName} (${sectionData.length})`;
+                tabButton.dataset.target = `#pane-${sectionKey}`;
+                tabButton.className = `admin-tab-btn whitespace-nowrap py-2 px-1 text-sm font-medium border-b-2 ${isActive ? 'text-white border-red-500' : 'text-gray-400 hover:text-white hover:border-gray-500 border-transparent'}`;
+                tabNav.appendChild(tabButton);
+        
+                // Create Tab Pane
+                const paneDiv = document.createElement('div');
+                paneDiv.id = `pane-${sectionKey}`;
+                paneDiv.className = `admin-tab-pane ${isActive ? '' : 'hidden'}`;
+        
                 const grid = document.createElement('div');
                 grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
-
+        
                 if (sectionData.length === 0) {
                     grid.innerHTML = '<p class="text-gray-500 col-span-full">No content in this section.</p>';
                 } else {
@@ -415,9 +429,32 @@ document.addEventListener('DOMContentLoaded', () => {
                         grid.appendChild(itemCard);
                     });
                 }
-                sectionDiv.appendChild(grid);
-                contentContainer.appendChild(sectionDiv);
+                paneDiv.appendChild(grid);
+                tabPanesContainer.appendChild(paneDiv);
             });
+            
+            contentManagerContainer.appendChild(tabNav);
+            contentManagerContainer.appendChild(tabPanesContainer);
+        
+            // Add Tab Switching Logic
+            tabNav.addEventListener('click', (e) => {
+                if (e.target.matches('.admin-tab-btn')) {
+                    const targetPaneId = e.target.dataset.target;
+                    
+                    // Update buttons
+                    tabNav.querySelectorAll('.admin-tab-btn').forEach(btn => {
+                        btn.className = 'admin-tab-btn whitespace-nowrap py-2 px-1 text-sm font-medium border-b-2 text-gray-400 hover:text-white hover:border-gray-500 border-transparent';
+                    });
+                    e.target.className = 'admin-tab-btn whitespace-nowrap py-2 px-1 text-sm font-medium border-b-2 text-white border-red-500';
+        
+                    // Update panes
+                    tabPanesContainer.querySelectorAll('.admin-tab-pane').forEach(pane => {
+                        pane.classList.add('hidden');
+                    });
+                    document.querySelector(targetPaneId).classList.remove('hidden');
+                }
+            });
+        
             addEventListenersToButtons();
         }
 
@@ -563,7 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 content.id = Date.now();
-                allContent.push(content);
+                allContent.unshift(content);
             }
 
             const success = await saveAllContent();
