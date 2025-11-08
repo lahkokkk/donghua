@@ -53,6 +53,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.title = `${item.title} - Donghua动画`;
 
+            // Update Meta Tags
+            const metaDescription = document.querySelector('meta[name="description"]');
+            const metaKeywords = document.querySelector('meta[name="keywords"]');
+
+            if (metaDescription && item.synopsis) {
+                metaDescription.setAttribute('content', item.synopsis.substring(0, 160) + '...');
+            }
+            if (metaKeywords && item.metaTags) {
+                metaKeywords.setAttribute('content', item.metaTags);
+            }
+
             const episodeListHTML = item.episodes && item.episodes.length > 0 
                 ? item.episodes.map(ep => 
                     `<li><a href="watch.html?id=${item.id}&ep=${ep.ep}" class="block bg-[#2a2a2a] hover:bg-red-600 p-3 rounded-md transition-colors">Episode ${ep.ep}</a></li>`

@@ -289,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
             episodesContainer.innerHTML = '';
             document.querySelectorAll('input[name="genre_checkbox"]').forEach(cb => cb.checked = false);
             form.other_genres.value = '';
+            form.metaTags.value = '';
             editState = null;
             formSubmitButton.textContent = 'Add Content';
             cancelButton.classList.add('hidden');
@@ -434,6 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.imageUrl.value = itemToEdit.imageUrl || '';
                 form.episode.value = itemToEdit.episode || '';
                 form.synopsis.value = itemToEdit.synopsis || '';
+                form.metaTags.value = itemToEdit.metaTags || '';
                 form.type.value = itemToEdit.type || 'Donghua';
                 form.subbed.checked = itemToEdit.subbed || false;
                 form.ongoing.checked = itemToEdit.ongoing || false;
@@ -547,6 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 subbed: formData.has('subbed'),
                 ongoing: formData.has('ongoing'),
                 synopsis: formData.get('synopsis'),
+                metaTags: formData.get('metaTags'),
                 genres: allGenres,
                 sections: selectedSections,
                 episodes: episodes
