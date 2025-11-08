@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            document.title = `${item.title} - Anichin`;
+            document.title = `${item.title} - Donghua动画`;
 
             const episodeListHTML = item.episodes && item.episodes.length > 0 
                 ? item.episodes.map(ep => 

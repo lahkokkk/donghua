@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  throw new Error('Specific episode not found.');
             }
 
-            document.title = `Watching ${item.title} - Ep ${currentEpisode.ep} - Anichin`;
+            document.title = `Watching ${item.title} - Ep ${currentEpisode.ep} - Donghua动画`;
 
             // Set Player
             playerContainer.innerHTML = `
