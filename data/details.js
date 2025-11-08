@@ -1,6 +1,11 @@
+// KODE INI UNTUK details.js
 document.addEventListener('DOMContentLoaded', () => {
-    const apiEndpoint = 'https://ho.las635948.workers.dev/';
-    const siteConfigApiUrl = 'https://ho.las635948.workers.dev/';
+    // =======================================================
+    // PERBAIKAN: Gunakan path API lokal dari Worker
+    const apiEndpoint = '/api/content';
+    const siteConfigApiUrl = '/api/config';
+    // =======================================================
+
     const params = new URLSearchParams(window.location.search);
     const contentId = params.get('id');
 
@@ -41,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadContentDetails() {
         try {
+            // Mengambil data dari /api/content
             const response = await fetch(`${apiEndpoint}?v=${new Date().getTime()}`);
             if (!response.ok) throw new Error('Failed to load content data');
             const allContent = await response.json();
@@ -48,48 +54,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!item) {
                 contentArea.innerHTML = '<p class="text-red-500 text-center">Content not found.</p>';
+                document.title = "Content Not Found - Donghua动画";
                 return;
             }
 
+            // Judul halaman di-set oleh client-side, TAPI akan ditimpa oleh SEO injection dari Worker untuk bot.
             document.title = `${item.title} - Donghua动画`;
 
-            // Helper function to set meta tags
-            const setMetaTag = (property, content) => {
-                if (!content) return; // Don't set empty tags
-                let element = document.querySelector(`meta[name="${property}"], meta[property="${property}"]`);
-                if (!element) {
-                    element = document.createElement('meta');
-                    if (property.startsWith('og:')) {
-                        element.setAttribute('property', property);
-                    } else {
-                        element.setAttribute('name', property);
-                    }
-                    document.head.appendChild(element);
-                }
-                element.setAttribute('content', content);
-            };
+            // Di sini kita tidak perlu lagi set meta tag karena Worker sudah melakukannya di server-side.
+            // Ini membuat halaman lebih cepat dan kodenya lebih bersih.
+            // const setMetaTag = ... (Bisa dihapus)
+            // setMetaTag(...) (Bisa dihapus)
+            
+            // Urutkan episode dari yang terbesar (terbaru) ke terkecil
+            const sortedEpisodes = item.episodes.sort((a, b) => Number(b.ep) - Number(a.ep));
 
-            // Update Meta Tags
-            const description = item.synopsis ? item.synopsis.substring(0, 160).trim() + '...' : `Details for ${item.title}`;
-            const title = `${item.title} - Donghua动画`;
-
-            setMetaTag('description', description);
-            setMetaTag('keywords', item.metaTags);
-            setMetaTag('og:title', title);
-            setMetaTag('og:description', description);
-            setMetaTag('og:image', item.imageUrl);
-            setMetaTag('og:type', 'video.tv_show');
-            setMetaTag('og:url', window.location.href);
-            setMetaTag('twitter:card', 'summary_large_image');
-
-            const episodeListHTML = item.episodes && item.episodes.length > 0 
-                ? item.episodes.map(ep => 
+            const episodeListHTML = sortedEpisodes && sortedEpisodes.length > 0
+                ? sortedEpisodes.map(ep =>
                     `<li><a href="watch.html?id=${item.id}&ep=${ep.ep}" class="block bg-[#2a2a2a] hover:bg-red-600 p-3 rounded-md transition-colors">Episode ${ep.ep}</a></li>`
                   ).join('')
                 : '<li><p class="text-gray-500">No episodes available yet.</p></li>';
 
             const genreListHTML = item.genres && item.genres.length > 0
-                ? item.genres.map(genre => 
+                ? item.genres.map(genre =>
                     `<a href="../genres.html?genre=${encodeURIComponent(genre)}" class="bg-[#2a2a2a] hover:bg-red-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors">${genre}</a>`
                   ).join('')
                 : '';
