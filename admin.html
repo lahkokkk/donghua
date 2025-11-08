@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Anichin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body class="bg-[#121212] text-gray-300 font-sans">
+
+    <header class="bg-[#1a1a1a] p-4 shadow-md">
+        <div class="container mx-auto">
+            <h1 class="text-white text-2xl font-bold">Anichin Content Management</h1>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        <div class="bg-[#1a1a1a] p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-bold text-white mb-6">Add/Update Content</h2>
+            
+            <form id="content-form" class="space-y-4">
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-400">Title</label>
+                    <input type="text" id="title" name="title" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                </div>
+
+                <div>
+                    <label for="imageUrl" class="block text-sm font-medium text-gray-400">Image URL</label>
+                    <input type="url" id="imageUrl" name="imageUrl" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                </div>
+                
+                <div>
+                    <label for="episode" class="block text-sm font-medium text-gray-400">Episode (e.g., "Ep 168")</label>
+                    <input type="text" id="episode" name="episode" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
+                </div>
+
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-400">Type</label>
+                    <select id="type" name="type" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
+                        <option>Donghua</option>
+                        <option>Movie</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="section" class="block text-sm font-medium text-gray-400">Section</label>
+                    <select id="section" name="section" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
+                        <option value="popularToday">Popular Today</option>
+                        <option value="latestRelease">Latest Release</option>
+                        <option value="movies">Movies</option>
+                        <option value="upcoming">Upcoming Donghua</option>
+                        <option value="dropped">Dropped Project</option>
+                        <option value="slider">Slider</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center">
+                    <input id="subbed" name="subbed" type="checkbox" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500">
+                    <label for="subbed" class="ml-2 block text-sm text-gray-300">Subbed</label>
+                </div>
+
+                <div class="flex items-center">
+                    <input id="ongoing" name="ongoing" type="checkbox" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500">
+                    <label for="ongoing" class="ml-2 block text-sm text-gray-300">Ongoing (Clock Icon)</label>
+                </div>
+
+                <div>
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 focus:ring-offset-gray-800">
+                        Add Content
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-[#1a1a1a] p-6 rounded-lg shadow-lg mt-8">
+            <h2 class="text-xl font-bold text-white mb-6">Current Content</h2>
+            <div id="current-content-container">
+                 <p class="text-gray-400">Loading content...</p>
+                 <!-- Content will be dynamically loaded here by admin.js -->
+            </div>
+        </div>
+    </main>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>
