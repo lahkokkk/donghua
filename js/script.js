@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const apiEndpoint = 'https://jsonbin-clone.bisay510.workers.dev/16f38f54-9873-45ed-8692-2ec5ea899365';
-    const siteConfigApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/0353d142-7372-443d-adb7-63bafdd0791e';
+    const apiEndpoint = 'https://ho.las635948.workers.dev/';
+    const siteConfigApiUrl = 'https://ho.las635948.workers.dev/';
 
     const sectionMappings = {
         popularToday: 'popular-today-container',

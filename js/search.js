@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const apiEndpoint = 'https://jsonbin-clone.bisay510.workers.dev/16f38f54-9873-45ed-8692-2ec5ea899365';
+    const apiEndpoint = 'https://ho.las635948.workers.dev/';
     let allContent = [];
     let isFetched = false;
 
