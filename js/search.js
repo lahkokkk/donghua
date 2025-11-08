@@ -1,3 +1,4 @@
+// KODE INI UNTUK search.js
 document.addEventListener('DOMContentLoaded', () => {
     const searchBtn = document.getElementById('search-btn');
     const searchModal = document.getElementById('search-modal');
@@ -9,8 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Search elements not found. Search functionality disabled.');
         return;
     }
-
-    const apiEndpoint = 'https://ho.las635948.workers.dev/';
+    
+    // =======================================================
+    // PERBAIKAN: Gunakan path API lokal dari Worker
+    const apiEndpoint = '/api/content';
+    // =======================================================
+    
     let allContent = [];
     let isFetched = false;
 
@@ -33,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fetchAllContent = async () => {
         searchResultsContainer.innerHTML = '<p class="text-gray-400 p-4">Loading data...</p>';
         try {
+            // Mengambil data dari /api/content
             const res = await fetch(`${apiEndpoint}?v=${new Date().getTime()}`);
             if (!res.ok) throw new Error('Network response was not ok');
             allContent = await res.json();
@@ -60,11 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (results.length > 0) {
             // Determine correct path for details.html
-            const isInDataFolder = window.location.pathname.includes('/data/');
-            const onListPage = window.location.pathname.includes('/list.html');
-            let detailPathPrefix = isInDataFolder ? '' : 'data/';
-            if (onListPage) {
-                 detailPathPrefix = 'data/';
+            // This logic dynamically adjusts the link path based on the current page.
+            let detailPathPrefix = '';
+            const currentPath = window.location.pathname;
+            if (!currentPath.includes('/data/')) {
+                detailPathPrefix = 'data/';
             }
 
             searchResultsContainer.innerHTML = results.map(item => `
@@ -83,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
-    // Simple debounce
+    // Simple debounce to prevent searching on every key press
     let debounceTimer;
     searchInput.addEventListener('input', () => {
         clearTimeout(debounceTimer);
