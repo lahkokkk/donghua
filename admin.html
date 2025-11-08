@@ -45,49 +45,61 @@
                 <h2 class="text-xl font-bold text-white mb-6">Add/Update Content</h2>
                 
                 <form id="content-form" class="space-y-4">
-                    <div>
-                        <label for="title" class="block text-sm font-medium text-gray-400">Title</label>
-                        <input type="text" id="title" name="title" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                    <!-- Standard Fields -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="title" class="block text-sm font-medium text-gray-400">Title</label>
+                            <input type="text" id="title" name="title" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                        </div>
+                        <div>
+                            <label for="imageUrl" class="block text-sm font-medium text-gray-400">Image URL</label>
+                            <input type="url" id="imageUrl" name="imageUrl" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                        </div>
+                         <div>
+                            <label for="episode" class="block text-sm font-medium text-gray-400">Latest Episode (Card display)</label>
+                            <input type="text" id="episode" name="episode" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
+                        </div>
+                        <div>
+                            <label for="type" class="block text-sm font-medium text-gray-400">Type</label>
+                            <select id="type" name="type" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
+                                <option>Donghua</option>
+                                <option>Movie</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div>
-                        <label for="imageUrl" class="block text-sm font-medium text-gray-400">Image URL</label>
-                        <input type="url" id="imageUrl" name="imageUrl" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                        <label for="synopsis" class="block text-sm font-medium text-gray-400">Synopsis</label>
+                        <textarea id="synopsis" name="synopsis" rows="4" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500"></textarea>
                     </div>
-                    
+
+                    <!-- Episode Management -->
                     <div>
-                        <label for="episode" class="block text-sm font-medium text-gray-400">Episode (e.g., "Ep 168")</label>
-                        <input type="text" id="episode" name="episode" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
+                         <label class="block text-sm font-medium text-gray-400">Episode Management</label>
+                         <div id="episodes-container" class="mt-2 space-y-2"></div>
+                         <button type="button" id="add-episode-btn" class="mt-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-1 px-3 rounded">+ Add Episode</button>
                     </div>
 
-                    <div>
-                        <label for="type" class="block text-sm font-medium text-gray-400">Type</label>
-                        <select id="type" name="type" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
-                            <option>Donghua</option>
-                            <option>Movie</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="section" class="block text-sm font-medium text-gray-400">Section</label>
-                        <select id="section" name="section" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
-                            <option value="popularToday">Popular Today</option>
-                            <option value="latestRelease">Latest Release</option>
-                            <option value="movies">Movies</option>
-                            <option value="upcoming">Upcoming Donghua</option>
-                            <option value="dropped">Dropped Project</option>
-                            <option value="slider">Slider</option>
-                        </select>
-                    </div>
-
-                    <div class="flex items-center">
-                        <input id="subbed" name="subbed" type="checkbox" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500">
-                        <label for="subbed" class="ml-2 block text-sm text-gray-300">Subbed</label>
-                    </div>
-
-                    <div class="flex items-center">
-                        <input id="ongoing" name="ongoing" type="checkbox" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500">
-                        <label for="ongoing" class="ml-2 block text-sm text-gray-300">Ongoing (Clock Icon)</label>
+                    <!-- Sections & Flags -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400">Sections</label>
+                            <div id="section-checkboxes" class="mt-2 space-y-2">
+                                <div class="flex items-center"><input id="section-popularToday" name="section" type="checkbox" value="popularToday" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500"><label for="section-popularToday" class="ml-2 block text-sm text-gray-300">Popular Today</label></div>
+                                <div class="flex items-center"><input id="section-latestRelease" name="section" type="checkbox" value="latestRelease" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500"><label for="section-latestRelease" class="ml-2 block text-sm text-gray-300">Latest Release</label></div>
+                                <div class="flex items-center"><input id="section-movies" name="section" type="checkbox" value="movies" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500"><label for="section-movies" class="ml-2 block text-sm text-gray-300">Movies</label></div>
+                                <div class="flex items-center"><input id="section-upcoming" name="section" type="checkbox" value="upcoming" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500"><label for="section-upcoming" class="ml-2 block text-sm text-gray-300">Upcoming Donghua</label></div>
+                                <div class="flex items-center"><input id="section-dropped" name="section" type="checkbox" value="dropped" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500"><label for="section-dropped" class="ml-2 block text-sm text-gray-300">Dropped Project</label></div>
+                                <div class="flex items-center"><input id="section-slider" name="section" type="checkbox" value="slider" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500"><label for="section-slider" class="ml-2 block text-sm text-gray-300">Slider</label></div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400">Flags</label>
+                            <div class="mt-2 space-y-2">
+                                <div class="flex items-center"><input id="subbed" name="subbed" type="checkbox" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500"><label for="subbed" class="ml-2 block text-sm text-gray-300">Subbed</label></div>
+                                <div class="flex items-center"><input id="ongoing" name="ongoing" type="checkbox" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500"><label for="ongoing" class="ml-2 block text-sm text-gray-300">Ongoing (Clock Icon)</label></div>
+                            </div>
+                        </div>
                     </div>
 
                     <div>
