@@ -47,6 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) return; // Fail silently
             const config = await response.json();
 
+            // Set Favicon
+            const favicon = document.getElementById('favicon');
+            if (favicon && config.favicon) {
+                favicon.href = config.favicon;
+            }
+
             // Populate Header
             const headerTitle = document.getElementById('header-title');
             const headerSubtitle = document.getElementById('header-subtitle');

@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- MAIN ADMIN PANEL LOGIC ---
     function initializeAdminPanel() {
         const allContentApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/16f38f54-9873-45ed-8692-2ec5ea899365';
-        const siteConfigApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/0353d142-7372-443d-adb7-63bafdd0791e'; // Fictional URL for site config
+        const siteConfigApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/0353d142-7372-443d-adb7-63bafdd0791e';
         
         // Add Logout functionality
         const logoutBtn = document.getElementById('logout-btn');
@@ -85,6 +85,37 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Site Configuration Handling ---
         const siteConfigForm = document.getElementById('site-config-form');
         const configSaveStatus = document.getElementById('config-save-status');
+        const faviconUploadInput = document.getElementById('faviconUpload');
+        const faviconStatus = document.getElementById('favicon-upload-status');
+        const faviconPreview = document.getElementById('favicon-preview');
+        let newFaviconDataUrl = null;
+
+        faviconUploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            faviconStatus.textContent = '';
+
+            if (!['image/x-icon', 'image/vnd.microsoft.icon', 'image/png', 'image/svg+xml'].includes(file.type)) {
+                 faviconStatus.textContent = 'Error: Invalid file type.';
+                 faviconUploadInput.value = '';
+                 return;
+            }
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                newFaviconDataUrl = reader.result;
+                faviconPreview.src = newFaviconDataUrl;
+                faviconPreview.classList.remove('hidden');
+                faviconStatus.textContent = `Ready to save '${file.name}'.`;
+                faviconStatus.classList.remove('text-red-500');
+                faviconStatus.classList.add('text-green-500');
+            };
+            reader.onerror = () => {
+                faviconStatus.textContent = 'Error reading file.';
+                faviconStatus.classList.add('text-red-500');
+            }
+        });
 
         async function loadAndDisplaySiteConfig() {
             try {
@@ -102,6 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     siteConfigForm.announcementHighlight.value = config.announcement.highlight || '';
                     siteConfigForm.announcementClosing.value = config.announcement.closing || '';
                 }
+                if (config.favicon) {
+                    faviconPreview.src = config.favicon;
+                    faviconPreview.classList.remove('hidden');
+                } else {
+                    faviconPreview.classList.add('hidden');
+                }
             } catch (error) {
                 console.error('Error loading site config:', error);
                 configSaveStatus.textContent = 'Could not load site config.';
@@ -116,31 +153,46 @@ document.addEventListener('DOMContentLoaded', () => {
             submitButton.textContent = 'Saving...';
             configSaveStatus.textContent = '';
 
-            const newConfig = {
-                headerTitle: siteConfigForm.headerTitle.value,
-                headerSubtitle: siteConfigForm.headerSubtitle.value,
-                footerCopyright: siteConfigForm.footerCopyright.value,
-                footerDisclaimer: siteConfigForm.footerDisclaimer.value,
-                announcement: {
-                    title: siteConfigForm.announcementTitle.value,
-                    body: siteConfigForm.announcementBody.value,
-                    highlight: siteConfigForm.announcementHighlight.value,
-                    closing: siteConfigForm.announcementClosing.value
-                }
-            };
-
             try {
+                // Fetch current config to ensure we don't overwrite unrelated fields
+                const currentConfigRes = await fetch(`${siteConfigApiUrl}?v=${new Date().getTime()}`);
+                if (!currentConfigRes.ok) throw new Error('Could not fetch current config to update.');
+                const currentConfig = await currentConfigRes.json();
+
+                const updatedConfig = {
+                    ...currentConfig,
+                    headerTitle: siteConfigForm.headerTitle.value,
+                    headerSubtitle: siteConfigForm.headerSubtitle.value,
+                    footerCopyright: siteConfigForm.footerCopyright.value,
+                    footerDisclaimer: siteConfigForm.footerDisclaimer.value,
+                    announcement: {
+                        title: siteConfigForm.announcementTitle.value,
+                        body: siteConfigForm.announcementBody.value,
+                        highlight: siteConfigForm.announcementHighlight.value,
+                        closing: siteConfigForm.announcementClosing.value
+                    }
+                };
+
+                if (newFaviconDataUrl) {
+                    updatedConfig.favicon = newFaviconDataUrl;
+                }
+
                 const response = await fetch(siteConfigApiUrl, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newConfig)
+                    body: JSON.stringify(updatedConfig)
                 });
                 if (!response.ok) throw new Error('Failed to save configuration');
                 configSaveStatus.textContent = 'Configuration saved successfully!';
                 configSaveStatus.classList.add('text-green-500');
+                // Reset favicon state after successful save
+                newFaviconDataUrl = null;
+                faviconUploadInput.value = '';
+                faviconStatus.textContent = '';
+
             } catch (error) {
                 console.error('Error saving site config:', error);
-                configSaveStatus.textContent = 'Error saving configuration.';
+                configSaveStatus.textContent = `Error saving configuration: ${error.message}`;
                 configSaveStatus.classList.add('text-red-500');
             } finally {
                  setTimeout(() => { configSaveStatus.textContent = ''; configSaveStatus.className = 'text-sm text-center h-4 mt-2'; }, 5000);
