@@ -70,6 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- MAIN ADMIN PANEL LOGIC ---
     function initializeAdminPanel() {
+        const allContentApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/16f38f54-9873-45ed-8692-2ec5ea899365';
+        const siteConfigApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/0353d142-7372-443d-adb7-63bafdd0791e'; // Fictional URL for site config
+        
         // Add Logout functionality
         const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn) {
@@ -79,7 +82,74 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        const allContentApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/16f38f54-9873-45ed-8692-2ec5ea899365';
+        // --- Site Configuration Handling ---
+        const siteConfigForm = document.getElementById('site-config-form');
+        const configSaveStatus = document.getElementById('config-save-status');
+
+        async function loadAndDisplaySiteConfig() {
+            try {
+                const res = await fetch(`${siteConfigApiUrl}?v=${new Date().getTime()}`);
+                if (!res.ok) throw new Error('Failed to load site config');
+                const config = await res.json();
+
+                siteConfigForm.headerTitle.value = config.headerTitle || '';
+                siteConfigForm.headerSubtitle.value = config.headerSubtitle || '';
+                siteConfigForm.footerCopyright.value = config.footerCopyright || '';
+                siteConfigForm.footerDisclaimer.value = config.footerDisclaimer || '';
+                if (config.announcement) {
+                    siteConfigForm.announcementTitle.value = config.announcement.title || '';
+                    siteConfigForm.announcementBody.value = config.announcement.body || '';
+                    siteConfigForm.announcementHighlight.value = config.announcement.highlight || '';
+                    siteConfigForm.announcementClosing.value = config.announcement.closing || '';
+                }
+            } catch (error) {
+                console.error('Error loading site config:', error);
+                configSaveStatus.textContent = 'Could not load site config.';
+                configSaveStatus.classList.add('text-red-500');
+            }
+        }
+
+        siteConfigForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Saving...';
+            configSaveStatus.textContent = '';
+
+            const newConfig = {
+                headerTitle: siteConfigForm.headerTitle.value,
+                headerSubtitle: siteConfigForm.headerSubtitle.value,
+                footerCopyright: siteConfigForm.footerCopyright.value,
+                footerDisclaimer: siteConfigForm.footerDisclaimer.value,
+                announcement: {
+                    title: siteConfigForm.announcementTitle.value,
+                    body: siteConfigForm.announcementBody.value,
+                    highlight: siteConfigForm.announcementHighlight.value,
+                    closing: siteConfigForm.announcementClosing.value
+                }
+            };
+
+            try {
+                const response = await fetch(siteConfigApiUrl, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newConfig)
+                });
+                if (!response.ok) throw new Error('Failed to save configuration');
+                configSaveStatus.textContent = 'Configuration saved successfully!';
+                configSaveStatus.classList.add('text-green-500');
+            } catch (error) {
+                console.error('Error saving site config:', error);
+                configSaveStatus.textContent = 'Error saving configuration.';
+                configSaveStatus.classList.add('text-red-500');
+            } finally {
+                 setTimeout(() => { configSaveStatus.textContent = ''; configSaveStatus.className = 'text-sm text-center h-4 mt-2'; }, 5000);
+                submitButton.disabled = false;
+                submitButton.textContent = 'Save Site Configuration';
+            }
+        });
+
+        // --- Content Management Handling ---
         const form = document.getElementById('content-form');
         const contentContainer = document.getElementById('current-content-container');
         const episodesContainer = document.getElementById('episodes-container');
@@ -93,9 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         imageUploadInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (!file) {
-                return;
-            }
+            if (!file) return;
 
             if (!file.type.startsWith('image/')) {
                 uploadStatus.textContent = 'Error: Please select an image file.';
@@ -174,16 +242,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
         cancelButton.addEventListener('click', resetForm);
 
-        const addEpisodeField = (ep = '', url = '') => {
+        const addServerField = (container, name = '', url = '') => {
             const div = document.createElement('div');
-            div.className = 'flex items-center space-x-2 episode-field';
+            div.className = 'flex items-center space-x-2 server-field ml-8 mt-2';
             div.innerHTML = `
-                <input type="text" name="ep_number" placeholder="Ep Number (e.g., 1 or 'Movie')" value="${ep}" class="flex-1 bg-[#2a2a2a] border border-gray-600 rounded-md py-1 px-2 text-white text-sm" required>
-                <input type="url" name="ep_url" placeholder="Video URL" value="${url}" class="flex-1 bg-[#2a2a2a] border border-gray-600 rounded-md py-1 px-2 text-white text-sm" required>
-                <button type="button" class="remove-episode-btn bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-md text-xs">Remove</button>
+                <input type="text" name="server_name" placeholder="Server Name (e.g., HD)" value="${name}" class="flex-1 bg-[#3a3a3a] border border-gray-500 rounded-md py-1 px-2 text-white text-xs" required>
+                <input type="url" name="server_url" placeholder="Video URL" value="${url}" class="flex-1 bg-[#3a3a3a] border border-gray-500 rounded-md py-1 px-2 text-white text-xs" required>
+                <button type="button" class="remove-server-btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-md text-xs">X</button>
             `;
-            episodesContainer.appendChild(div);
-            div.querySelector('.remove-episode-btn').addEventListener('click', () => div.remove());
+            container.appendChild(div);
+            div.querySelector('.remove-server-btn').addEventListener('click', () => div.remove());
+        };
+
+        const addEpisodeField = (ep = '', servers = []) => {
+            const episodeDiv = document.createElement('div');
+            episodeDiv.className = 'episode-field bg-[#2a2a2a] p-3 rounded-md border border-gray-700';
+
+            const serversContainer = document.createElement('div');
+            serversContainer.className = 'servers-container space-y-2';
+
+            episodeDiv.innerHTML = `
+                <div class="flex flex-wrap items-center gap-2">
+                    <input type="text" name="ep_number" placeholder="Ep Number (e.g., 1)" value="${ep}" class="w-full sm:w-1/4 bg-[#3a3a3a] border border-gray-500 rounded-md py-1 px-2 text-white text-sm" required>
+                    <button type="button" class="add-server-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-2 rounded-md text-xs">+ Add Server</button>
+                    <div class="flex-grow"></div>
+                    <button type="button" class="remove-episode-btn bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-md text-xs">Remove Episode</button>
+                </div>
+            `;
+            episodeDiv.appendChild(serversContainer);
+
+            episodesContainer.appendChild(episodeDiv);
+
+            episodeDiv.querySelector('.add-server-btn').addEventListener('click', () => addServerField(serversContainer));
+            episodeDiv.querySelector('.remove-episode-btn').addEventListener('click', () => episodeDiv.remove());
+
+            if (servers.length > 0) {
+                servers.forEach(server => addServerField(serversContainer, server.name, server.url));
+            } else {
+                addServerField(serversContainer); // Add one default server field
+            }
         };
 
         addEpisodeBtn.addEventListener('click', () => addEpisodeField());
@@ -221,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
             contentContainer.innerHTML = '';
             const sections = ['popularToday', 'latestRelease', 'movies', 'upcoming', 'dropped', 'slider'];
             const contentBySection = allContent.reduce((acc, item) => {
+                if (!item.sections) item.sections = [];
                 item.sections.forEach(section => {
                     if (!acc[section]) acc[section] = [];
                     acc[section].push(item);
@@ -292,7 +390,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 episodesContainer.innerHTML = '';
                 if(itemToEdit.episodes) {
-                    itemToEdit.episodes.forEach(ep => addEpisodeField(ep.ep, ep.url));
+                    itemToEdit.episodes.forEach(ep => {
+                        const servers = ep.servers || (ep.url ? [{name: 'Default', url: ep.url}] : []);
+                        addEpisodeField(ep.ep, servers);
+                    });
                 }
                 
                 editState = { id: itemToEdit.id };
@@ -346,9 +447,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const episodes = [];
             document.querySelectorAll('.episode-field').forEach(field => {
                 const epNumber = field.querySelector('input[name="ep_number"]').value.trim();
-                const epUrl = field.querySelector('input[name="ep_url"]').value.trim();
-                if (epNumber && epUrl) {
-                    episodes.push({ ep: epNumber, url: epUrl });
+                if (epNumber) {
+                    const servers = [];
+                    field.querySelectorAll('.server-field').forEach(serverField => {
+                        const serverName = serverField.querySelector('input[name="server_name"]').value.trim();
+                        const serverUrl = serverField.querySelector('input[name="server_url"]').value.trim();
+                        if (serverName && serverUrl) {
+                            servers.push({ name: serverName, url: serverUrl });
+                        }
+                    });
+                    if (servers.length > 0) {
+                        episodes.push({ ep: epNumber, servers: servers });
+                    }
                 }
             });
 
@@ -388,6 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
             formSubmitButton.textContent = editState ? 'Update Content' : 'Add Content';
         });
 
+        loadAndDisplaySiteConfig();
         loadContent();
     }
 });

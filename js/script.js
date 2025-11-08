@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const apiEndpoint = 'https://jsonbin-clone.bisay510.workers.dev/16f38f54-9873-45ed-8692-2ec5ea899365';
+    const siteConfigApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/0353d142-7372-443d-adb7-63bafdd0791e';
 
     const sectionMappings = {
         popularToday: 'popular-today-container',
@@ -9,6 +10,40 @@ document.addEventListener('DOMContentLoaded', () => {
         upcoming: 'upcoming-container',
         dropped: 'dropped-container'
     };
+
+    async function loadSiteConfig() {
+        try {
+            const response = await fetch(`${siteConfigApiUrl}?v=${new Date().getTime()}`);
+            if (!response.ok) return; // Fail silently
+            const config = await response.json();
+
+            // Populate Header
+            const headerTitle = document.getElementById('header-title');
+            const headerSubtitle = document.getElementById('header-subtitle');
+            if (headerTitle && config.headerTitle) headerTitle.textContent = config.headerTitle;
+            if (headerSubtitle && config.headerSubtitle) headerSubtitle.textContent = config.headerSubtitle;
+
+            // Populate Footer
+            const footerCopyright = document.getElementById('footer-copyright');
+            const footerDisclaimer = document.getElementById('footer-disclaimer');
+            if (footerCopyright && config.footerCopyright) footerCopyright.innerHTML = config.footerCopyright;
+            if (footerDisclaimer && config.footerDisclaimer) footerDisclaimer.textContent = config.footerDisclaimer;
+
+            // Populate Announcement
+            if (config.announcement) {
+                const announcementTitle = document.getElementById('announcement-title');
+                if (announcementTitle && config.announcement.title) announcementTitle.textContent = config.announcement.title;
+                const announcementBody = document.getElementById('announcement-body');
+                if (announcementBody && config.announcement.body) announcementBody.textContent = config.announcement.body;
+                const announcementHighlight = document.getElementById('announcement-highlight');
+                if (announcementHighlight && config.announcement.highlight) announcementHighlight.textContent = config.announcement.highlight;
+                const announcementClosing = document.getElementById('announcement-closing');
+                if (announcementClosing && config.announcement.closing) announcementClosing.textContent = config.announcement.closing;
+            }
+        } catch (error) {
+            console.warn('Could not load site config.', error);
+        }
+    }
 
     const createCard = (item) => {
         const isMovie = item.type === 'Movie';
@@ -94,5 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Initial Load
+    loadSiteConfig();
     loadAllContent();
 });

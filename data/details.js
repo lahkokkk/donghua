@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const apiEndpoint = 'https://jsonbin-clone.bisay510.workers.dev/16f38f54-9873-45ed-8692-2ec5ea899365';
+    const siteConfigApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/0353d142-7372-443d-adb7-63bafdd0791e';
     const params = new URLSearchParams(window.location.search);
     const contentId = params.get('id');
 
@@ -8,6 +9,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!contentId) {
         contentArea.innerHTML = '<p class="text-red-500 text-center">Invalid content ID.</p>';
         return;
+    }
+
+    async function loadSiteConfig() {
+        try {
+            const response = await fetch(`${siteConfigApiUrl}?v=${new Date().getTime()}`);
+            if (!response.ok) return; // Fail silently
+            const config = await response.json();
+
+            // Populate Header
+            const headerTitle = document.getElementById('header-title');
+            const headerSubtitle = document.getElementById('header-subtitle');
+            if (headerTitle && config.headerTitle) headerTitle.textContent = config.headerTitle;
+            if (headerSubtitle && config.headerSubtitle) headerSubtitle.textContent = config.headerSubtitle;
+
+            // Populate Footer
+            const footerCopyright = document.getElementById('footer-copyright');
+            const footerDisclaimer = document.getElementById('footer-disclaimer');
+            if (footerCopyright && config.footerCopyright) footerCopyright.innerHTML = config.footerCopyright;
+            if (footerDisclaimer && config.footerDisclaimer) footerDisclaimer.textContent = config.footerDisclaimer;
+        } catch (error) {
+            console.warn('Could not load site config.', error);
+        }
     }
 
     async function loadContentDetails() {
@@ -87,5 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    loadSiteConfig();
     loadContentDetails();
 });

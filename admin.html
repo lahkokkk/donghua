@@ -120,6 +120,57 @@
             </div>
 
             <div class="bg-[#1a1a1a] p-6 rounded-lg shadow-lg mt-8">
+                <h2 class="text-xl font-bold text-white mb-6">Site Configuration</h2>
+                <form id="site-config-form" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="headerTitle" class="block text-sm font-medium text-gray-400">Header Title</label>
+                            <input type="text" id="headerTitle" name="headerTitle" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label for="headerSubtitle" class="block text-sm font-medium text-gray-400">Header Subtitle</label>
+                            <input type="text" id="headerSubtitle" name="headerSubtitle" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label for="footerCopyright" class="block text-sm font-medium text-gray-400">Footer Copyright</label>
+                            <input type="text" id="footerCopyright" name="footerCopyright" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        </div>
+                        <div>
+                            <label for="footerDisclaimer" class="block text-sm font-medium text-gray-400">Footer Disclaimer</label>
+                            <input type="text" id="footerDisclaimer" name="footerDisclaimer" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        </div>
+                    </div>
+                    <fieldset class="border border-gray-700 p-4 rounded-md">
+                        <legend class="text-lg font-medium text-white px-2">Announcement Board</legend>
+                        <div class="space-y-3">
+                            <div>
+                                <label for="announcementTitle" class="block text-sm font-medium text-gray-400">Title</label>
+                                <input type="text" id="announcementTitle" name="announcementTitle" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-green-500 focus:border-green-500">
+                            </div>
+                            <div>
+                                <label for="announcementBody" class="block text-sm font-medium text-gray-400">Body</label>
+                                <textarea id="announcementBody" name="announcementBody" rows="3" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-green-500 focus:border-green-500"></textarea>
+                            </div>
+                            <div>
+                                <label for="announcementHighlight" class="block text-sm font-medium text-gray-400">Highlight Text</label>
+                                <input type="text" id="announcementHighlight" name="announcementHighlight" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-green-500 focus:border-green-500">
+                            </div>
+                             <div>
+                                <label for="announcementClosing" class="block text-sm font-medium text-gray-400">Closing</label>
+                                <textarea id="announcementClosing" name="announcementClosing" rows="3" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-green-500 focus:border-green-500"></textarea>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div>
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">
+                            Save Site Configuration
+                        </button>
+                        <p id="config-save-status" class="text-sm text-center h-4 mt-2"></p>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-[#1a1a1a] p-6 rounded-lg shadow-lg mt-8">
                 <h2 class="text-xl font-bold text-white mb-6">Current Content</h2>
                 <div id="current-content-container">
                     <!-- Content will be dynamically loaded here by admin.js -->
