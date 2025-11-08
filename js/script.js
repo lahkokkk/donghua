@@ -1,3 +1,4 @@
+// KODE JAVASCRIPT ANDA YANG SUDAH DIPERBAIKI
 document.addEventListener('DOMContentLoaded', () => {
 
     const menuBtn = document.getElementById('menu-btn');
@@ -30,8 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const apiEndpoint = 'https://ho.las635948.workers.dev/';
-    const siteConfigApiUrl = 'https://ho.las635948.workers.dev/';
+    // =======================================================
+    // PERUBAHAN UTAMA ADA DI DUA BARIS DI BAWAH INI!
+    // Kita sekarang menggunakan path lokal, bukan URL lengkap.
+    const apiEndpoint = '/api/content';
+    const siteConfigApiUrl = '/api/config';
+    // =======================================================
 
     const sectionMappings = {
         popularToday: 'popular-today-container',
@@ -46,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadSiteConfig() {
         try {
+            // Mengambil dari /api/config
             const response = await fetch(`${siteConfigApiUrl}?v=${new Date().getTime()}`);
             if (!response.ok) return; // Fail silently
             const config = await response.json();
@@ -235,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function loadAllContent() {
         try {
+            // Mengambil dari /api/content
             const response = await fetch(apiEndpoint + `?v=${new Date().getTime()}`);
             if (!response.ok) throw new Error('Failed to load content data');
             const allContent = await response.json();
