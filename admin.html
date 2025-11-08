@@ -9,78 +9,103 @@
 </head>
 <body class="bg-[#121212] text-gray-300 font-sans">
 
-    <header class="bg-[#1a1a1a] p-4 shadow-md">
-        <div class="container mx-auto">
-            <h1 class="text-white text-2xl font-bold">Anichin Content Management</h1>
-        </div>
-    </header>
-
-    <main class="container mx-auto p-4 md:p-8">
-        <div class="bg-[#1a1a1a] p-6 rounded-lg shadow-lg">
-            <h2 class="text-xl font-bold text-white mb-6">Add/Update Content</h2>
-            
-            <form id="content-form" class="space-y-4">
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-[#1a1a1a] p-8 rounded-lg shadow-xl w-full max-w-sm">
+            <h2 class="text-2xl font-bold text-white text-center mb-6">Admin Login</h2>
+            <form id="login-form" class="space-y-4">
                 <div>
-                    <label for="title" class="block text-sm font-medium text-gray-400">Title</label>
-                    <input type="text" id="title" name="title" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                    <label for="email" class="block text-sm font-medium text-gray-400">Email</label>
+                    <input type="email" id="email" name="email" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
                 </div>
-
                 <div>
-                    <label for="imageUrl" class="block text-sm font-medium text-gray-400">Image URL</label>
-                    <input type="url" id="imageUrl" name="imageUrl" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                    <label for="password" class="block text-sm font-medium text-gray-400">Password</label>
+                    <input type="password" id="password" name="password" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
                 </div>
-                
-                <div>
-                    <label for="episode" class="block text-sm font-medium text-gray-400">Episode (e.g., "Ep 168")</label>
-                    <input type="text" id="episode" name="episode" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
-                </div>
-
-                <div>
-                    <label for="type" class="block text-sm font-medium text-gray-400">Type</label>
-                    <select id="type" name="type" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
-                        <option>Donghua</option>
-                        <option>Movie</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="section" class="block text-sm font-medium text-gray-400">Section</label>
-                    <select id="section" name="section" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
-                        <option value="popularToday">Popular Today</option>
-                        <option value="latestRelease">Latest Release</option>
-                        <option value="movies">Movies</option>
-                        <option value="upcoming">Upcoming Donghua</option>
-                        <option value="dropped">Dropped Project</option>
-                        <option value="slider">Slider</option>
-                    </select>
-                </div>
-
-                <div class="flex items-center">
-                    <input id="subbed" name="subbed" type="checkbox" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500">
-                    <label for="subbed" class="ml-2 block text-sm text-gray-300">Subbed</label>
-                </div>
-
-                <div class="flex items-center">
-                    <input id="ongoing" name="ongoing" type="checkbox" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500">
-                    <label for="ongoing" class="ml-2 block text-sm text-gray-300">Ongoing (Clock Icon)</label>
-                </div>
-
                 <div>
                     <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 focus:ring-offset-gray-800">
-                        Add Content
+                        Login
                     </button>
                 </div>
+                <p id="login-error" class="text-red-500 text-sm text-center h-4"></p>
             </form>
         </div>
+    </div>
 
-        <div class="bg-[#1a1a1a] p-6 rounded-lg shadow-lg mt-8">
-            <h2 class="text-xl font-bold text-white mb-6">Current Content</h2>
-            <div id="current-content-container">
-                 <p class="text-gray-400">Loading content...</p>
-                 <!-- Content will be dynamically loaded here by admin.js -->
+    <!-- Main Content (Initially Hidden) -->
+    <div id="main-content" class="hidden">
+        <header class="bg-[#1a1a1a] p-4 shadow-md">
+            <div class="container mx-auto">
+                <h1 class="text-white text-2xl font-bold">Anichin Content Management</h1>
             </div>
-        </div>
-    </main>
+        </header>
+
+        <main class="container mx-auto p-4 md:p-8">
+            <div class="bg-[#1a1a1a] p-6 rounded-lg shadow-lg">
+                <h2 class="text-xl font-bold text-white mb-6">Add/Update Content</h2>
+                
+                <form id="content-form" class="space-y-4">
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-400">Title</label>
+                        <input type="text" id="title" name="title" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                    </div>
+
+                    <div>
+                        <label for="imageUrl" class="block text-sm font-medium text-gray-400">Image URL</label>
+                        <input type="url" id="imageUrl" name="imageUrl" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500" required>
+                    </div>
+                    
+                    <div>
+                        <label for="episode" class="block text-sm font-medium text-gray-400">Episode (e.g., "Ep 168")</label>
+                        <input type="text" id="episode" name="episode" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
+                    </div>
+
+                    <div>
+                        <label for="type" class="block text-sm font-medium text-gray-400">Type</label>
+                        <select id="type" name="type" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
+                            <option>Donghua</option>
+                            <option>Movie</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="section" class="block text-sm font-medium text-gray-400">Section</label>
+                        <select id="section" name="section" class="mt-1 block w-full bg-[#2a2a2a] border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500">
+                            <option value="popularToday">Popular Today</option>
+                            <option value="latestRelease">Latest Release</option>
+                            <option value="movies">Movies</option>
+                            <option value="upcoming">Upcoming Donghua</option>
+                            <option value="dropped">Dropped Project</option>
+                            <option value="slider">Slider</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center">
+                        <input id="subbed" name="subbed" type="checkbox" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500">
+                        <label for="subbed" class="ml-2 block text-sm text-gray-300">Subbed</label>
+                    </div>
+
+                    <div class="flex items-center">
+                        <input id="ongoing" name="ongoing" type="checkbox" class="h-4 w-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500">
+                        <label for="ongoing" class="ml-2 block text-sm text-gray-300">Ongoing (Clock Icon)</label>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 focus:ring-offset-gray-800">
+                            Add Content
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-[#1a1a1a] p-6 rounded-lg shadow-lg mt-8">
+                <h2 class="text-xl font-bold text-white mb-6">Current Content</h2>
+                <div id="current-content-container">
+                    <!-- Content will be dynamically loaded here by admin.js -->
+                </div>
+            </div>
+        </main>
+    </div>
 
     <script src="js/admin.js"></script>
 </body>
