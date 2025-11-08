@@ -1,6 +1,11 @@
+// KODE INI UNTUK watch.js
 document.addEventListener('DOMContentLoaded', () => {
-    const apiEndpoint = 'https://ho.las635948.workers.dev/';
-    const siteConfigApiUrl = 'https://ho.las635948.workers.dev/';
+    // =======================================================
+    // PERBAIKAN: Gunakan path API lokal dari Worker
+    const apiEndpoint = '/api/content';
+    const siteConfigApiUrl = '/api/config';
+    // =======================================================
+
     const params = new URLSearchParams(window.location.search);
     const contentId = params.get('id');
     const episodeNumber = params.get('ep');
@@ -45,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadVideo() {
         try {
+            // Mengambil data dari /api/content
             const response = await fetch(`${apiEndpoint}?v=${new Date().getTime()}`);
             if (!response.ok) throw new Error('Failed to load content data');
             const allContent = await response.json();
@@ -53,38 +59,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!item || !item.episodes || item.episodes.length === 0) {
                 throw new Error('Content or episodes not found.');
             }
+            
+            // Urutkan episode dari yang terbesar (terbaru) ke terkecil
+            const sortedEpisodes = item.episodes.sort((a, b) => Number(b.ep) - Number(a.ep));
 
-            const currentEpisode = item.episodes.find(e => e.ep == episodeNumber);
+            const currentEpisode = sortedEpisodes.find(e => e.ep == episodeNumber);
             if (!currentEpisode) {
                  throw new Error('Specific episode not found.');
             }
 
+            // Judul halaman akan ditimpa oleh Worker untuk SEO
             document.title = `Watching ${item.title} - Ep ${currentEpisode.ep} - Donghua动画`;
-
-            // Update Meta Tags
-            const setMetaTag = (property, content) => {
-                let element = document.querySelector(`meta[name="${property}"], meta[property="${property}"]`);
-                if (!element) {
-                    element = document.createElement('meta');
-                    if (property.startsWith('og:')) {
-                        element.setAttribute('property', property);
-                    } else {
-                        element.setAttribute('name', property);
-                    }
-                    document.head.appendChild(element);
-                }
-                element.setAttribute('content', content);
-            };
-
-            const description = item.synopsis ? item.synopsis.substring(0, 160) + '...' : `Watch ${item.title} Episode ${currentEpisode.ep}`;
-
-            setMetaTag('description', description);
-            setMetaTag('og:title', `${item.title} - Episode ${currentEpisode.ep}`);
-            setMetaTag('og:description', description);
-            setMetaTag('og:image', item.imageUrl);
-            setMetaTag('og:url', window.location.href);
-            setMetaTag('og:type', 'video.episode');
-            setMetaTag('twitter:card', 'summary_large_image');
+            
+            // Logika meta tag client-side bisa dihapus karena sudah ditangani Worker
+            // const setMetaTag = ... (hapus)
+            // setMetaTag(...) (hapus)
 
             // Handle both old {url} and new {servers} episode format
             const servers = currentEpisode.servers || (currentEpisode.url ? [{name: 'Default', url: currentEpisode.url}] : []);
@@ -142,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Set Episode List
-            const episodeListHTML = item.episodes.map(ep => {
+            const episodeListHTML = sortedEpisodes.map(ep => {
                 const isActive = ep.ep == episodeNumber;
                 return `
                     <li>
