@@ -13,11 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileMenu.addEventListener('click', (e) => { if (e.target === mobileMenu) { closeMenu(); } });
     }
 
-    // =======================================================
-    // PERUBAHAN KRUSIAL: Menggunakan path API lokal dari Worker
+    // Menggunakan path API lokal dari Worker
     const apiEndpoint = '/api/content';
     const siteConfigApiUrl = '/api/config';
-    // =======================================================
 
     const sectionMappings = { popularToday: 'popular-today-container', latestRelease: 'latest-release-container', movies: 'movies-container', upcoming: 'upcoming-container', dropped: 'dropped-container' };
     let latestReleaseCurrentPage = 1;
@@ -86,10 +84,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderLatestReleasePage = (page, data, container) => { const start = (page - 1) * LATEST_RELEASE_ITEMS_PER_PAGE; const end = start + LATEST_RELEASE_ITEMS_PER_PAGE; const paginatedItems = data.slice(start, end); container.innerHTML = paginatedItems.map(item => createCard(item)).join(''); };
     const setupPagination = (currentPage, totalItems, data) => { const paginationContainer = document.getElementById('latest-release-pagination'); if (!paginationContainer) return; const totalPages = Math.ceil(totalItems / LATEST_RELEASE_ITEMS_PER_PAGE); paginationContainer.innerHTML = ''; if (totalPages <= 1) return; const createButton = (content, newPage, isDisabled = false, isCurrent = false) => { const li = document.createElement('li'); const button = document.createElement('button'); button.innerHTML = content; button.className = `px-3 py-2 leading-tight border border-gray-700 ${isCurrent ? 'text-black bg-white' : 'text-gray-400 bg-[#2a2a2a] hover:bg-gray-700 hover:text-white'} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`; button.disabled = isDisabled; if (!isDisabled) { button.addEventListener('click', () => { latestReleaseCurrentPage = newPage; renderLatestReleasePage(latestReleaseCurrentPage, data, document.getElementById('latest-release-container')); setupPagination(latestReleaseCurrentPage, totalItems, data); }); } li.appendChild(button); return li; }; paginationContainer.appendChild(createButton('<i class="fa-solid fa-chevron-left"></i>', currentPage - 1, currentPage === 1)); for (let i = 1; i <= totalPages; i++) { paginationContainer.appendChild(createButton(i, i, false, currentPage === i)); } paginationContainer.appendChild(createButton('<i class="fa-solid fa-chevron-right"></i>', currentPage + 1, currentPage === totalPages)); };
+    
     const displaySections = (allContent) => {
         const latestReleaseData = allContent.filter(item => item.sections && item.sections.includes('latestRelease'));
         for (const sectionKey in sectionMappings) {
             const container = document.getElementById(sectionMappings[sectionKey]);
             if (container) {
                 if (sectionKey === 'latestRelease') {
-                    if (latestReleaseData.length > 0) { renderLatestReleasePage(latestReleaseCurrentPage, latestReleaseData, container); setupPagination(latestReleaseCurrentPage, latestReleaseData.length, latestReleaseData); } else { container.innerHTML = `<p
+                    if (latestReleaseData.length > 0) {
+                        renderLatestReleasePage(latestReleaseCurrentPage, latestReleaseData, container);
+                        setupPagination(latestReleaseCurrentPage, latestReleaseData.length, latestReleaseData);
+                    } else {
+                        container.innerHTML = `<p class="col-span-full text-gray-500">No content available in this section.</p>`;
+                    }
+                } else {
+                    const sectionData = allContent.filter(item => item.sections && item.sections.includes(sectionKey));
+                    if (sectionData.length > 0) {
+                        container.innerHTML = sectionData.map(item => createCard(item)).join('');
+                    } else {
+                        container.innerHTML = `<p class="col-span-full text-gray-500">No content available in this section.</p>`;
+                    }
+                }
+            }
+        }
+    };
+    
+    async function loadAllContent() {
+        try {
+            const response = await fetch(apiEndpoint + `?v=${new Date().getTime()}`);
+            if (!response.ok) throw new Error('Failed to load content data');
+            const allContent = await response.json();
+            allContent.sort((a, b) => b.id - a.id);
+            const sliderItems = allContent.filter(item => item.sections && item.sections.includes('slider'));
+            displaySlider(sliderItems);
+            displaySections(allContent);
+        } catch (error) {
+            console.error('Error loading content:', error);
+            const sliderContainer = document.getElementById('slider-container');
+            if (sliderContainer) { sliderContainer.innerHTML = `<p class="text-center text-red-500 p-8">Could not load slider content.</p>`; }
+            for (const sectionKey in sectionMappings) {
+                const container = document.getElementById(sectionMappings[sectionKey]);
+                if(container) container.innerHTML = `<p class="col-span-full text-red-500">Could not load content.</p>`;
+            }
+        }
+    }
+
+    loadSiteConfig();
+    loadAllContent();
+});
