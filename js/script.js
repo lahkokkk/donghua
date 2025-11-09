@@ -47,6 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const headerSubtitle = document.getElementById('header-subtitle');
             if (headerTitle && config.headerTitle) headerTitle.textContent = config.headerTitle;
             if (headerSubtitle && config.headerSubtitle) headerSubtitle.textContent = config.headerSubtitle;
+
+            const menuTitle = document.getElementById('menu-title');
+            const menuSubtitle = document.getElementById('menu-subtitle');
+            if (menuTitle && config.headerTitle) menuTitle.textContent = config.headerTitle;
+            if (menuSubtitle && config.headerSubtitle) menuSubtitle.textContent = config.headerSubtitle;
+
             const footerCopyright = document.getElementById('footer-copyright');
             const footerDisclaimer = document.getElementById('footer-disclaimer');
             if (footerCopyright && config.footerCopyright) footerCopyright.innerHTML = config.footerCopyright;
