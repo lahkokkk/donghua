@@ -1,4 +1,4 @@
-// KODE INI UNTUK ADMIN.JS (VERSI MULTI-BIN DENGAN DISTRIBUSI ACAK)
+// KODE INI UNTUK ADMIN.JS (VERSI MULTI-BIN LENGKAP)
 document.addEventListener('DOMContentLoaded', () => {
 
     // Helper function for SHA-256 Hashing using Web Crypto API
@@ -87,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const siteConfigApiUrl = 'https://jsonbin-clone.bisay510.workers.dev/0353d142-7372-443d-adb7-63bafdd0791e';
         
-        // Add Logout functionality
         const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
@@ -286,25 +285,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (servers.length > 0) {
                 servers.forEach(server => addServerField(serversContainer, server.name, server.url));
             } else {
-                addServerField(serversContainer); // Add one default server field
+                addServerField(serversContainer);
             }
         };
 
         addEpisodeBtn.addEventListener('click', () => addEpisodeField());
 
-        // =======================================================
-        // PERUBAHAN KRUSIAL #2: FUNGSI UNTUK MENYIMPAN KE BIN YANG BENAR
-        // =======================================================
         async function saveContentToBin(contentToSave, targetBinUrl) {
             try {
-                // Hapus properti _sourceBinUrl sebelum menyimpan agar tidak mengotori data
                 const cleanedContent = contentToSave.map(({ _sourceBinUrl, ...rest }) => rest);
-                
-                const response = await fetch(targetBinUrl, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(cleanedContent)
-                });
+                const response = await fetch(targetBinUrl, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cleanedContent) });
                 if (!response.ok) throw new Error(`Failed to save data to ${targetBinUrl}. Status: ${response.status}`);
                 return true;
             } catch (error) {
@@ -314,27 +304,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // =======================================================
-        // PERUBAHAN KRUSIAL #3: MEMUAT DATA DARI SEMUA BIN
-        // =======================================================
         async function loadContent() {
             contentManagerContainer.innerHTML = '<p class="text-gray-400">Loading content from all sources...</p>';
             try {
                 const fetchPromises = contentApiEndpoints.map(url => fetch(url + `?v=${new Date().getTime()}`));
                 const responses = await Promise.all(fetchPromises);
-
                 const jsonPromises = responses.map((res, index) => {
                     if (!res.ok) throw new Error(`Failed to load from ${contentApiEndpoints[index]}`);
                     return res.json().then(data => {
-                        // Tambahkan properti untuk melacak asal data
                         data.forEach(item => item._sourceBinUrl = contentApiEndpoints[index]);
                         return data;
                     });
                 });
-                
                 const jsonArrays = await Promise.all(jsonPromises);
-                allContent = [].concat(...jsonArrays); // Gabungkan semua data
-                
+                allContent = [].concat(...jsonArrays);
                 displayContent();
             } catch (error) {
                 console.error("Could not load content:", error);
@@ -344,7 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function displayContent() {
             if (!contentManagerContainer) return;
-        
             contentManagerContainer.innerHTML = '';
             const sections = ['slider', 'popularToday', 'latestRelease', 'movies', 'upcoming', 'dropped'];
             const contentBySection = allContent.reduce((acc, item) => {
@@ -355,30 +337,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 return acc;
             }, {});
-        
             const tabNav = document.createElement('nav');
             tabNav.className = 'border-b border-gray-700 mb-4 -mb-px flex space-x-6 overflow-x-auto';
-            
             const tabPanesContainer = document.createElement('div');
-        
             sections.forEach((sectionKey, index) => {
                 const isActive = index === 0;
                 const sectionData = contentBySection[sectionKey] || [];
-                
                 const tabButton = document.createElement('button');
                 const sectionName = sectionKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
                 tabButton.textContent = `${sectionName} (${sectionData.length})`;
                 tabButton.dataset.target = `#pane-${sectionKey}`;
                 tabButton.className = `admin-tab-btn whitespace-nowrap py-2 px-1 text-sm font-medium border-b-2 ${isActive ? 'text-white border-red-500' : 'text-gray-400 hover:text-white hover:border-gray-500 border-transparent'}`;
                 tabNav.appendChild(tabButton);
-        
                 const paneDiv = document.createElement('div');
                 paneDiv.id = `pane-${sectionKey}`;
                 paneDiv.className = `admin-tab-pane ${isActive ? '' : 'hidden'}`;
-        
                 const grid = document.createElement('div');
                 grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4';
-        
                 if (sectionData.length === 0) {
                     grid.innerHTML = '<p class="text-gray-500 col-span-full">No content in this section.</p>';
                 } else {
@@ -403,26 +378,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 paneDiv.appendChild(grid);
                 tabPanesContainer.appendChild(paneDiv);
             });
-            
             contentManagerContainer.appendChild(tabNav);
             contentManagerContainer.appendChild(tabPanesContainer);
-        
             tabNav.addEventListener('click', (e) => {
                 if (e.target.matches('.admin-tab-btn')) {
                     const targetPaneId = e.target.dataset.target;
-                    
                     tabNav.querySelectorAll('.admin-tab-btn').forEach(btn => {
                         btn.className = 'admin-tab-btn whitespace-nowrap py-2 px-1 text-sm font-medium border-b-2 text-gray-400 hover:text-white hover:border-gray-500 border-transparent';
                     });
                     e.target.className = 'admin-tab-btn whitespace-nowrap py-2 px-1 text-sm font-medium border-b-2 text-white border-red-500';
-        
-                    tabPanesContainer.querySelectorAll('.admin-tab-pane').forEach(pane => {
-                        pane.classList.add('hidden');
-                    });
+                    tabPanesContainer.querySelectorAll('.admin-tab-pane').forEach(pane => { pane.classList.add('hidden'); });
                     document.querySelector(targetPaneId).classList.remove('hidden');
                 }
             });
-        
             addEventListenersToButtons();
         }
 
@@ -470,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     itemToEdit.episodes.forEach(ep => {
                         const servers = ep.servers || (ep.url ? [{name: 'Default', url: ep.url}] : []);
                         addEpisodeField(ep.ep, servers);
-});
+                    });
                 }
                 
                 editState = { id: itemToEdit.id, _sourceBinUrl: itemToEdit._sourceBinUrl };
@@ -480,9 +448,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // =======================================================
-        // PERUBAHAN KRUSIAL #4: LOGIKA HAPUS YANG BARU
-        // =======================================================
         async function handleDelete(e) {
             const { id } = e.target.dataset;
             const numericId = Number(id);
@@ -504,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (success) {
                     alert('Item deleted successfully.');
-                    loadContent(); // Muat ulang semua konten
+                    loadContent();
                 } else {
                     alert('Failed to delete. Please check the console and try again.');
                     e.target.disabled = false;
@@ -513,9 +478,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // =======================================================
-        // PERUBAHAN KRUSIAL #5: LOGIKA SUBMIT YANG BARU
-        // =======================================================
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             formSubmitButton.disabled = true;
@@ -568,10 +530,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let success = false;
 
             if (editState) {
-                // UPDATE: Simpan ke bin yang sama
                 targetBinUrl = editState._sourceBinUrl;
                 content.id = editState.id;
-                content._sourceBinUrl = targetBinUrl; // Pastikan properti ini tetap ada
+                content._sourceBinUrl = targetBinUrl;
                 contentForTargetBin = allContent.filter(item => item._sourceBinUrl === targetBinUrl);
                 const itemIndex = contentForTargetBin.findIndex(item => item.id === content.id);
                 if (itemIndex > -1) {
@@ -582,7 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const randomIndex = Math.floor(Math.random() * contentApiEndpoints.length);
                 targetBinUrl = contentApiEndpoints[randomIndex];
                 content.id = Date.now();
-                content._sourceBinUrl = targetBinUrl; // Tandai asal bin
+                content._sourceBinUrl = targetBinUrl;
                 contentForTargetBin = allContent.filter(item => item._sourceBinUrl === targetBinUrl);
                 contentForTargetBin.unshift(content);
             }
@@ -605,5 +566,3 @@ document.addEventListener('DOMContentLoaded', () => {
         loadContent();
     }
 });
-
-Setelah ini, Admin Panel Anda akan berfungsi dengan benar, dan yang terpenting, setiap kali Anda **menambahkan item baru**, item tersebut akan disimpan ke salah satu dari lima bin Anda secara acak, mendistribusikan beban secara merata.
